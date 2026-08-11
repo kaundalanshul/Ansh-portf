@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Dashboard — Ansh Portfolio Admin</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔐</text></svg>">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <!-- ── Sidebar Toggle (mobile) ─────────────── -->
+  <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ── Toast Container ─────────────────────── -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ── Dashboard Layout ────────────────────── -->
+  <div class="dashboard">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">Ansh.</div>
+        <div class="subtitle">Admin Panel</div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-item active" data-section="overview" onclick="switchSection('overview')">
+          <span class="icon">📊</span>
+          <span>Overview</span>
+        </div>
+        <div class="nav-item" data-section="projects" onclick="switchSection('projects')">
+          <span class="icon">🚀</span>
+          <span>Projects</span>
+        </div>
+        <div class="nav-item" data-section="skills" onclick="switchSection('skills')">
+          <span class="icon">🎯</span>
+          <span>Skills</span>
+        </div>
+        <div class="nav-item" data-section="messages" onclick="switchSection('messages')">
+          <span class="icon">💬</span>
+          <span>Messages</span>
+          <span class="badge" id="unreadBadge" style="display:none;">0</span>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="/" class="nav-item" title="View public site">
+          <span class="icon">🌐</span>
+          <span>View Site</span>
+        </a>
+        <div class="nav-item" onclick="logout()">
+          <span class="icon">🚪</span>
+          <span>Logout</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+      <!-- Top Bar -->
+      <div class="top-bar">
+        <h1 id="pageTitle">Overview</h1>
+        <div class="admin-info">
+          <span id="adminEmail">admin</span>
+          <div class="admin-avatar" id="adminAvatar">A</div>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+          <div class="stat-icon">🚀</div>
+          <div class="stat-number" id="totalProjects">0</div>
+          <div class="stat-label">Total Projects</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🎯</div>
+          <div class="stat-number" id="totalSkills">0</div>
+          <div class="stat-label">Total Skills</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">💬</div>
+          <div class="stat-number" id="totalMessages">0</div>
+          <div class="stat-label">Total Messages</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📩</div>
+          <div class="stat-number" id="unreadMessages">0</div>
+          <div class="stat-label">Unread Messages</div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           Overview Section
+           ══════════════════════════════════════════ -->
+      <div class="content-section active" id="section-overview">
+        <div class="section-toolbar">
+          <h2>Welcome to Your Dashboard</h2>
+        </div>
+        <div class="data-table-wrapper" style="padding: 32px; text-align: center;">
+          <p style="color: var(--text-secondary); font-size: 1.05rem; margin-bottom: 8px;">
+            👋 Use the sidebar to manage your portfolio content.
+          </p>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">
+            Add projects, update skills, and view contact messages from visitors.
+          </p>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           Projects Section
+           ══════════════════════════════════════════ -->
+      <div class="content-section" id="section-projects">
+        <div class="section-toolbar">
+          <h2>Manage Projects</h2>
+          <button class="btn btn-primary" onclick="openProjectModal()">
+            + Add Project
+          </button>
+        </div>
+
+        <div class="data-table-wrapper">
+          <table class="data-table" id="projectsTable">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Technologies</th>
+                <th>Featured</th>
+                <th>Order</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="projectsTableBody">
+              <!-- Dynamic content -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           Skills Section
+           ══════════════════════════════════════════ -->
+      <div class="content-section" id="section-skills">
+        <div class="section-toolbar">
+          <h2>Manage Skills</h2>
+          <button class="btn btn-primary" onclick="openSkillModal()">
+            + Add Skill
+          </button>
+        </div>
+
+        <div class="data-table-wrapper">
+          <table class="data-table" id="skillsTable">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Proficiency</th>
+                <th>Icon</th>
+                <th>Order</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="skillsTableBody">
+              <!-- Dynamic content -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           Messages Section
+           ══════════════════════════════════════════ -->
+      <div class="content-section" id="section-messages">
+        <div class="section-toolbar">
+          <h2>Contact Messages</h2>
+        </div>
+
+        <div class="data-table-wrapper">
+          <table class="data-table" id="messagesTable">
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>From</th>
+                <th>Subject</th>
+                <th>Message</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="messagesTableBody">
+              <!-- Dynamic content -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       Project Modal
+       ══════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="projectModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="projectModalTitle">Add Project</h3>
+        <button class="modal-close" onclick="closeModal('projectModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="projectForm">
+          <input type="hidden" id="projectId">
+
+          <div class="form-group">
+            <label for="projectTitle">Title *</label>
+            <input type="text" id="projectTitle" placeholder="My Awesome Project" required>
+          </div>
+
+          <div class="form-group">
+            <label for="projectDescription">Description *</label>
+            <textarea id="projectDescription" placeholder="Brief description of the project..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="projectTechnologies">Technologies * (comma separated)</label>
+            <input type="text" id="projectTechnologies" placeholder="React, Node.js, MongoDB" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="projectImageUrl">Image URL</label>
+              <input type="url" id="projectImageUrl" placeholder="https://...">
+            </div>
+            <div class="form-group">
+              <label for="projectOrder">Order</label>
+              <input type="number" id="projectOrder" placeholder="0" min="0" value="0">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="projectLiveUrl">Live Demo URL</label>
+              <input type="url" id="projectLiveUrl" placeholder="https://...">
+            </div>
+            <div class="form-group">
+              <label for="projectGithubUrl">GitHub URL</label>
+              <input type="url" id="projectGithubUrl" placeholder="https://github.com/...">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="projectFeatured"> Mark as Featured
+            </label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('projectModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveProject()">Save Project</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       Skill Modal
+       ══════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="skillModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="skillModalTitle">Add Skill</h3>
+        <button class="modal-close" onclick="closeModal('skillModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="skillForm">
+          <input type="hidden" id="skillId">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="skillName">Skill Name *</label>
+              <input type="text" id="skillName" placeholder="JavaScript" required>
+            </div>
+            <div class="form-group">
+              <label for="skillCategory">Category *</label>
+              <select id="skillCategory" required>
+                <option value="">Select category</option>
+                <option value="Frontend">Frontend</option>
+                <option value="Backend">Backend</option>
+                <option value="Tools">Tools</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="skillProficiency">Proficiency (1-100) *</label>
+              <input type="number" id="skillProficiency" placeholder="85" min="1" max="100" required>
+            </div>
+            <div class="form-group">
+              <label for="skillOrder">Order</label>
+              <input type="number" id="skillOrder" placeholder="0" min="0" value="0">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="skillIcon">Icon (emoji or text)</label>
+            <input type="text" id="skillIcon" placeholder="⚡">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('skillModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveSkill()">Save Skill</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       Message View Modal
+       ══════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="messageModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Message Details</h3>
+        <button class="modal-close" onclick="closeModal('messageModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="margin-bottom:16px;">
+          <strong style="color:var(--text-muted);font-size:0.8rem;text-transform:uppercase;">From</strong>
+          <p id="msgViewName" style="margin-top:4px;"></p>
+          <p id="msgViewEmail" style="color:var(--text-accent);font-size:0.9rem;"></p>
+        </div>
+        <div style="margin-bottom:16px;">
+          <strong style="color:var(--text-muted);font-size:0.8rem;text-transform:uppercase;">Subject</strong>
+          <p id="msgViewSubject" style="margin-top:4px;font-weight:600;"></p>
+        </div>
+        <div style="margin-bottom:16px;">
+          <strong style="color:var(--text-muted);font-size:0.8rem;text-transform:uppercase;">Message</strong>
+          <p id="msgViewBody" style="margin-top:4px;white-space:pre-wrap;line-height:1.7;"></p>
+        </div>
+        <div>
+          <strong style="color:var(--text-muted);font-size:0.8rem;text-transform:uppercase;">Received</strong>
+          <p id="msgViewDate" style="margin-top:4px;font-size:0.9rem;"></p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('messageModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       Confirm Delete Dialog
+       ══════════════════════════════════════════════ -->
+  <div class="modal-overlay confirm-dialog" id="confirmModal">
+    <div class="modal">
+      <div class="modal-body">
+        <div class="confirm-icon">⚠️</div>
+        <p class="confirm-text" id="confirmText">Are you sure you want to delete this item?</p>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:8px;">This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('confirmModal')">Cancel</button>
+        <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

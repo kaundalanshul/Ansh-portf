@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ansh — Full-Stack Developer. Explore my projects, skills, and get in touch.">
+  <meta name="keywords" content="portfolio, developer, full-stack, web development, Ansh">
+  <meta name="author" content="Ansh">
+  <title>Ansh | Full-Stack Developer — Portfolio</title>
+
+  <!-- Favicon (emoji-based SVG) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ── Background Effects ─────────────────────── -->
+  <div class="bg-grid"></div>
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+
+  <!-- ── Navigation ─────────────────────────────── -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a href="#hero" class="nav-logo">Ansh.</a>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#hero" class="active">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── Hero Section ───────────────────────────── -->
+  <section class="hero" id="hero">
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="dot"></span>
+          Available for opportunities
+        </div>
+
+        <h1>
+          Hi, I'm <span class="gradient-text">Ansh</span>
+        </h1>
+        <p class="subtitle">Full-Stack Developer & Creative Coder</p>
+        <p class="description">
+          I build modern, scalable web applications with clean code and intuitive designs.
+          Passionate about turning ideas into polished digital experiences.
+        </p>
+
+        <div class="hero-buttons">
+          <a href="#projects" class="btn btn-primary">
+            <span>🚀</span> View My Work
+          </a>
+          <a href="#contact" class="btn btn-secondary">
+            <span>💬</span> Get In Touch
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── About Section ──────────────────────────── -->
+  <section class="about" id="about">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="label">About Me</span>
+        <h2>Who I Am</h2>
+        <p>A passionate developer building the web, one project at a time.</p>
+      </div>
+
+      <div class="about-grid">
+        <div class="about-image-wrapper reveal">
+          <div class="about-image" id="aboutImage">
+            👨‍💻
+          </div>
+        </div>
+
+        <div class="about-text reveal">
+          <h3>Developer, Learner, Builder</h3>
+          <p>
+            I'm a full-stack developer who loves building things for the web.
+            I specialize in creating fast, accessible, and responsive applications
+            using modern technologies like React, Node.js, and MongoDB.
+          </p>
+          <p>
+            When I'm not coding, you'll find me exploring new technologies,
+            contributing to open source, or learning something completely new.
+            I believe in writing clean, maintainable code that makes a real impact.
+          </p>
+
+          <div class="about-stats">
+            <div class="stat-card" id="statProjects">
+              <div class="number">0+</div>
+              <div class="label">Projects</div>
+            </div>
+            <div class="stat-card" id="statSkills">
+              <div class="number">0+</div>
+              <div class="label">Skills</div>
+            </div>
+            <div class="stat-card">
+              <div class="number">∞</div>
+              <div class="label">Curiosity</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Projects Section ───────────────────────── -->
+  <section class="projects" id="projects">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="label">Portfolio</span>
+        <h2>Featured Projects</h2>
+        <p>Here are some of the projects I've been working on recently.</p>
+      </div>
+
+      <!-- Dynamic project grid (populated by JS) -->
+      <div class="projects-grid stagger-children" id="projectsGrid">
+        <!-- Loading skeletons -->
+        <div class="project-card skeleton" style="height:380px;"></div>
+        <div class="project-card skeleton" style="height:380px;"></div>
+        <div class="project-card skeleton" style="height:380px;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Skills Section ─────────────────────────── -->
+  <section class="skills" id="skills">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="label">Expertise</span>
+        <h2>Skills & Technologies</h2>
+        <p>Technologies and tools I work with on a daily basis.</p>
+      </div>
+
+      <!-- Dynamic skills categories (populated by JS) -->
+      <div class="skills-categories stagger-children" id="skillsGrid">
+        <!-- Loading skeletons -->
+        <div class="skill-category skeleton" style="height:250px;"></div>
+        <div class="skill-category skeleton" style="height:250px;"></div>
+        <div class="skill-category skeleton" style="height:250px;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Contact Section ────────────────────────── -->
+  <section class="contact" id="contact">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="label">Contact</span>
+        <h2>Get In Touch</h2>
+        <p>Have a project in mind or want to collaborate? Drop me a message!</p>
+      </div>
+
+      <div class="contact-grid">
+        <div class="contact-info reveal">
+          <h3>Let's work together</h3>
+          <p>
+            I'm always open to new opportunities and interesting projects.
+            Whether you have a question, a proposal, or just want to say hi,
+            feel free to reach out!
+          </p>
+
+          <div class="contact-detail">
+            <div class="icon-box">📧</div>
+            <div class="detail-text">
+              <div class="label">Email</div>
+              <div class="value">hello@ansh.dev</div>
+            </div>
+          </div>
+
+          <div class="contact-detail">
+            <div class="icon-box">📍</div>
+            <div class="detail-text">
+              <div class="label">Location</div>
+              <div class="value">India</div>
+            </div>
+          </div>
+
+          <div class="contact-detail">
+            <div class="icon-box">🕐</div>
+            <div class="detail-text">
+              <div class="label">Availability</div>
+              <div class="value">Open to work</div>
+            </div>
+          </div>
+        </div>
+
+        <form class="contact-form reveal" id="contactForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="contactName">Your Name</label>
+              <input type="text" id="contactName" name="name" placeholder="John Doe" required>
+            </div>
+            <div class="form-group">
+              <label for="contactEmail">Your Email</label>
+              <input type="email" id="contactEmail" name="email" placeholder="john@example.com" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="contactSubject">Subject</label>
+            <input type="text" id="contactSubject" name="subject" placeholder="Project inquiry" required>
+          </div>
+
+          <div class="form-group">
+            <label for="contactMessage">Message</label>
+            <textarea id="contactMessage" name="message" placeholder="Tell me about your project or idea..." required></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-submit" id="submitBtn">
+            <span>📨</span> Send Message
+          </button>
+
+          <div class="form-status" id="formStatus"></div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ─────────────────────────────────── -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <p class="footer-text">
+          © 2024 Ansh. Built with <span class="heart">♥</span> and lots of ☕
+        </p>
+        <div class="social-links">
+          <a href="https://github.com" target="_blank" class="social-link" aria-label="GitHub" title="GitHub">
+            <!-- GitHub SVG icon -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+          </a>
+          <a href="https://linkedin.com" target="_blank" class="social-link" aria-label="LinkedIn" title="LinkedIn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+            </svg>
+          </a>
+          <a href="https://twitter.com" target="_blank" class="social-link" aria-label="Twitter" title="Twitter">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ── JavaScript ─────────────────────────────── -->
+  <script src="js/main.js"></script>
+</body>
+</html>
