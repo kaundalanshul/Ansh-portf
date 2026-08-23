@@ -1,127 +1,80 @@
-# Ansh Portfolio — Full-Stack Portfolio Website
+# Ansh Portfolio
 
-A complete portfolio platform with a public-facing website, REST API backend, MongoDB database, and protected admin dashboard.
+A full-stack portfolio website split into **three independent applications**.
 
-## 🚀 Features
-
-- **Public Website** — Responsive single-page portfolio with Hero, About, Projects, Skills, and Contact sections
-- **REST API** — Node.js + Express backend with clean MVC architecture
-- **MongoDB Database** — Mongoose ODM with schemas for Admin, Project, Skill, and Message
-- **Admin Dashboard** — Protected panel to manage portfolio content (CRUD) with JWT authentication
-- **Contact Form** — Working form that stores messages in the database
-- **Mobile Responsive** — Fully responsive dark-theme design
-
-## 📁 Project Structure
+## Project Structure
 
 ```
-├── server/               # Backend API
-│   ├── config/           # Database connection
-│   ├── controllers/      # Route handlers
-│   ├── middleware/        # Auth, validation, error handling
-│   ├── models/           # Mongoose schemas
-│   ├── routes/           # API route definitions
-│   ├── utils/            # Seed scripts
-│   └── server.js         # Entry point
-├── public/               # Public portfolio website
-│   ├── css/style.css     # Design system
-│   ├── js/main.js        # Dynamic content loading
-│   └── index.html        # Single-page layout
-├── admin/                # Admin dashboard
-│   ├── css/admin.css     # Dashboard styles
-│   ├── js/auth.js        # Authentication
-│   ├── js/dashboard.js   # CRUD operations
-│   ├── index.html        # Login page
-│   └── dashboard.html    # Dashboard panel
-└── package.json
+├── backend/       → REST API server (Express + MongoDB)   → port 5000
+├── frontend/      → Portfolio website (static HTML/CSS/JS) → port 3000
+├── admin/         → Admin dashboard (static HTML/CSS/JS)   → port 3001
 ```
 
-## 🛠️ Setup & Installation
+Each part is **completely independent** — it has its own `package.json`, `node_modules`, and can be developed, deployed, and scaled separately.
 
-### Prerequisites
+---
 
-- **Node.js** v16+ ([download](https://nodejs.org))
-- **MongoDB** running locally or a MongoDB Atlas account
+## Quick Start
 
-### 1. Install dependencies
+### 1. Backend (start first)
 
 ```bash
+cd backend
 npm install
-```
-
-### 2. Configure environment
-
-Edit `server/.env` with your settings:
-
-```env
-MONGO_URI=mongodb://localhost:27017/ansh_portfolio
-JWT_SECRET=your_super_secret_key_here
-PORT=5000
-ADMIN_EMAIL=admin@anshportfolio.com
-ADMIN_PASSWORD=Admin@123
-```
-
-### 3. Seed admin user
-
-```bash
-npm run seed
-```
-
-### 4. Start the server
-
-```bash
-# Development (with auto-reload)
 npm run dev
+```
 
-# Production
+API will be available at `http://localhost:5000/api`
+
+**Default admin credentials** (see `backend/.env`):
+- Email: `admin@anshportfolio.com`
+- Password: `Admin@123`
+
+### 2. Frontend
+
+```bash
+cd frontend
+npm install
 npm start
 ```
 
-### 5. Open in browser
+Portfolio site at `http://localhost:3000`
 
-- **Public Site**: [http://localhost:5000](http://localhost:5000)
-- **Admin Panel**: [http://localhost:5000/admin](http://localhost:5000/admin)
-- **API Health**: [http://localhost:5000/api/health](http://localhost:5000/api/health)
+### 3. Admin Dashboard
 
-## 📡 API Endpoints
+```bash
+cd admin
+npm install
+npm start
+```
 
-### Auth
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| POST | `/api/auth/login` | Public | Admin login |
-| GET | `/api/auth/me` | Admin | Get profile |
+Admin panel at `http://localhost:3001`
 
-### Projects
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| GET | `/api/projects` | Public | List all projects |
-| GET | `/api/projects/:id` | Public | Get single project |
-| POST | `/api/projects` | Admin | Create project |
-| PUT | `/api/projects/:id` | Admin | Update project |
-| DELETE | `/api/projects/:id` | Admin | Delete project |
+---
 
-### Skills
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| GET | `/api/skills` | Public | List all skills |
-| POST | `/api/skills` | Admin | Create skill |
-| PUT | `/api/skills/:id` | Admin | Update skill |
-| DELETE | `/api/skills/:id` | Admin | Delete skill |
+## API Endpoints
 
-### Messages
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| POST | `/api/messages` | Public | Submit contact form |
-| GET | `/api/messages` | Admin | List all messages |
-| PATCH | `/api/messages/:id/read` | Admin | Toggle read status |
-| DELETE | `/api/messages/:id` | Admin | Delete message |
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/api/auth/login` | Admin login | No |
+| GET | `/api/projects` | List projects | No |
+| POST | `/api/projects` | Create project | Yes |
+| PUT | `/api/projects/:id` | Update project | Yes |
+| DELETE | `/api/projects/:id` | Delete project | Yes |
+| GET | `/api/skills` | List skills | No |
+| POST | `/api/skills` | Create skill | Yes |
+| PUT | `/api/skills/:id` | Update skill | Yes |
+| DELETE | `/api/skills/:id` | Delete skill | Yes |
+| POST | `/api/messages` | Submit contact message | No |
+| GET | `/api/messages` | List messages | Yes |
+| PATCH | `/api/messages/:id/read` | Toggle read status | Yes |
+| DELETE | `/api/messages/:id` | Delete message | Yes |
+| GET | `/api/health` | Health check | No |
 
-## 🔐 Default Admin Credentials
+---
 
-- **Email**: `admin@anshportfolio.com`
-- **Password**: `Admin@123`
+## Tech Stack
 
-> ⚠️ Change these in `.env` before deploying to production!
-
-## 📄 License
-
-MIT
+- **Backend**: Node.js, Express, MongoDB (with in-memory fallback), JWT auth
+- **Frontend**: HTML, CSS, JavaScript, Three.js (3D)
+- **Admin**: HTML, CSS, JavaScript

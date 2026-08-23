@@ -80,4 +80,55 @@ const getProfile = async (req, res) => {
   });
 };
 
-module.exports = { login, getProfile };
+/**
+ * PUT /api/auth/profile
+ * Update admin profile (email, password)
+ */
+const updateProfile = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const adminId = req.admin.id;
+
+    const admin = await Admin.findById(adminId);
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message: 'Admin user not found',
+      });
+    }
+
+    // Check if email is already in use
+    if (email && email.toLowerCase() !== admin.email) {
+      const emailExists = await Admin.findOne({ email: email.toLowerCase() });
+      if (emailExists) {
+        return res.status(400).json({
+          success: false,
+          message: 'Email is already in use',
+        });
+      }
+      admin.email = email.toLowerCase();
+    }
+
+    // Update password if provided
+    if (password) {
+      admin.password = password;
+    }
+
+    await admin.save();
+
+    res.json({
+      success: true,
+      message: 'Profile updated successfully',
+      data: {
+        admin: {
+          id: admin._id,
+          email: admin.email,
+        },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { login, getProfile, updateProfile };

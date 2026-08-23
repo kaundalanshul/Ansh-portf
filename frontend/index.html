@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Anshul Kaundal — Full Stack & MERN Stack Developer. Portfolio.">
+  <title>Anshul Kaundal | Full Stack & MERN Stack Developer</title>
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  
+  <link rel="stylesheet" href="css/style.css">
+  
+  <!-- Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="navbar" id="navbar">
+    <a href="#hero" class="nav-logo">HOME</a>
+    <a href="#about" class="nav-link">ABOUT</a>
+    <a href="#portfolio" class="nav-link">PORTFOLIO</a>
+    <a href="#hobbies" class="nav-link">INTERESTS</a>
+    <a href="#skills" class="nav-link">SKILLS</a>
+    <a href="#contact" class="nav-link">GET IN TOUCH</a>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero" id="hero">
+    <div id="canvas-container"></div> <!-- Three.js Canvas -->
+    <div class="hero-content">
+      <h1 class="hero-title">FULL STACK &<br>MERN STACK<br>DEVELOPER</h1>
+      <p class="hero-subtitle">Crafting digital experiences<br>with precision.</p>
+    </div>
+  </section>
+
+  <!-- About Section (Moved Up) -->
+  <section class="about" id="about">
+    <div class="container editorial-layout">
+      <div class="col left-col">
+        <div class="about-image-wrapper">
+          <img src="me_pfp.jpg" alt="Anshul Kaundal" class="about-image">
+        </div>
+      </div>
+      <div class="col text-content">
+        <p class="reveal-text serif-text">Hi, I'm Anshul Kaundal, a passionate MERN Stack Developer and Computer Science student who enjoys building modern, responsive, and user-friendly web applications.</p>
+        <p class="reveal-text">I specialize in MongoDB, Express.js, React.js, and Node.js, with a strong interest in creating scalable full-stack solutions. I love turning ideas into functional digital experiences while continuously learning and exploring new technologies.</p>
+        <p class="reveal-text highlight-text">Building. Learning. Creating. One project at a time.</p>
+        <div class="stats-row">
+          <div class="stat">
+            <span class="stat-num" id="statProjects">0+</span>
+            <span class="stat-label">Projects</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num" id="statSkills">0+</span>
+            <span class="stat-label">Skills</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Portfolio Section (Split Screen) -->
+  <section class="portfolio" id="portfolio">
+    <div class="portfolio-container">
+      <div class="portfolio-left">
+        <h2 class="section-title">SELECTED WORKS</h2>
+        <div class="project-index" id="projectIndex">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+      <div class="portfolio-right" id="projectsGallery">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Hobbies / Interests Section (New!) -->
+  <section class="hobbies" id="hobbies">
+    <div class="container">
+      <h2 class="section-title text-center">INTERESTS</h2>
+      <div class="hobbies-grid">
+        <div class="hobby-card">
+          <div class="hobby-image-wrapper">
+            <img src="hobby_code.jpg" alt="Coding" class="hobby-image">
+          </div>
+          <div class="hobby-info">
+            <span class="hobby-num">01</span>
+            <h3 class="hobby-title">CODING</h3>
+          </div>
+        </div>
+        <div class="hobby-card">
+          <div class="hobby-image-wrapper">
+            <img src="hobby_music.jpg" alt="Music" class="hobby-image">
+          </div>
+          <div class="hobby-info">
+            <span class="hobby-num">02</span>
+            <h3 class="hobby-title">MUSIC</h3>
+          </div>
+        </div>
+        <div class="hobby-card">
+          <div class="hobby-image-wrapper">
+            <img src="hobby_travel.jpg" alt="Travel" class="hobby-image">
+          </div>
+          <div class="hobby-info">
+            <span class="hobby-num">03</span>
+            <h3 class="hobby-title">TRAVEL</h3>
+          </div>
+        </div>
+        <div class="hobby-card">
+          <div class="hobby-image-wrapper">
+            <img src="hobby_reading.jpg" alt="Reading" class="hobby-image">
+          </div>
+          <div class="hobby-info">
+            <span class="hobby-num">04</span>
+            <h3 class="hobby-title">READING</h3>
+          </div>
+        </div>
+        <div class="hobby-card">
+          <div class="hobby-image-wrapper">
+            <img src="hobby_design.jpg" alt="Design" class="hobby-image">
+          </div>
+          <div class="hobby-info">
+            <span class="hobby-num">05</span>
+            <h3 class="hobby-title">DESIGN</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills Section -->
+  <section class="skills" id="skills">
+    <div class="container">
+      <h2 class="section-title text-center">EXPERTISE</h2>
+      <div class="skills-grid" id="skillsGrid">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="contact" id="contact">
+    <div class="container editorial-layout">
+      <div class="col">
+        <h2 class="section-title">LET'S TALK</h2>
+        <p class="contact-email">kaundalanshul725@gmail.com</p>
+      </div>
+      <div class="col">
+        <form class="contact-form" id="contactForm">
+          <input type="text" id="contactName" name="name" placeholder="Name" required>
+          <input type="email" id="contactEmail" name="email" placeholder="Email" required>
+          <input type="text" id="contactSubject" name="subject" placeholder="Subject" required>
+          <textarea id="contactMessage" name="message" placeholder="Message" required></textarea>
+          <button type="submit" class="btn-submit" id="submitBtn">[ SEND MESSAGE ]</button>
+          <div class="form-status" id="formStatus"></div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer with Marquee -->
+  <footer class="footer">
+    <div class="marquee-container">
+      <div class="marquee-content">
+        <span>ANSHUL KAUNDAL PORTFOLIO © 2026</span>
+        <span>◆</span>
+        <span>FULL STACK DEVELOPER</span>
+        <span>◆</span>
+        <span>AVAILABLE FOR WORK</span>
+        <span>◆</span>
+        <span>ANSHUL KAUNDAL PORTFOLIO © 2026</span>
+        <span>◆</span>
+        <span>FULL STACK DEVELOPER</span>
+        <span>◆</span>
+        <span>AVAILABLE FOR WORK</span>
+        <span>◆</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

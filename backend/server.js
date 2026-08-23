@@ -1,13 +1,14 @@
 /**
- * Server Entry Point
+ * Backend API Server
  * ──────────────────
- * Express application setup with:
- * - CORS configuration
+ * Pure REST API server with:
+ * - CORS configured for frontend (port 3000) and admin (port 3001)
  * - JSON body parsing
- * - Static file serving (public site + admin dashboard)
  * - API route mounting
  * - Global error handling
  * - MongoDB connection
+ *
+ * Does NOT serve any static files — frontend and admin are separate apps.
  */
 
 const express = require('express');
@@ -29,22 +30,22 @@ const app = express();
 
 /* ── Middleware ─────────────────────────────────── */
 
-// Enable CORS for all origins (tighten in production)
-app.use(cors());
+// CORS — allow requests from the frontend and admin dashboard
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:3001',
+    'http://127.0.0.1:3001',
+  ],
+  credentials: true,
+}));
 
 // Parse JSON request bodies
 app.use(express.json({ limit: '10mb' }));
 
 // Parse URL-encoded bodies
 app.use(express.urlencoded({ extended: true }));
-
-/* ── Static File Serving ───────────────────────── */
-
-// Serve the public portfolio website
-app.use('/', express.static(path.join(__dirname, '..', 'public')));
-
-// Serve the admin dashboard
-app.use('/admin', express.static(path.join(__dirname, '..', 'admin')));
 
 /* ── API Routes ────────────────────────────────── */
 
@@ -69,12 +70,6 @@ app.use('/api/*', (req, res) => {
     success: false,
     message: `API endpoint not found: ${req.method} ${req.originalUrl}`,
   });
-});
-
-/* ── Catch-all: serve public site for SPA-style navigation ── */
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
 });
 
 /* ── Global Error Handler ──────────────────────── */
@@ -104,9 +99,7 @@ const startServer = async () => {
 
     // Start listening
     const server = app.listen(PORT, () => {
-      console.log(`\n🚀 Server running on http://localhost:${PORT}`);
-      console.log(`📁 Public site:  http://localhost:${PORT}`);
-      console.log(`🔐 Admin panel:  http://localhost:${PORT}/admin`);
+      console.log(`\n🚀 Backend API running on http://localhost:${PORT}`);
       console.log(`📡 API base:     http://localhost:${PORT}/api`);
       console.log(`💚 Health check: http://localhost:${PORT}/api/health\n`);
     });

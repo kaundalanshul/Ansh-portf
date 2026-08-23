@@ -588,3 +588,61 @@ function formatDate(isoString) {
     minute: '2-digit',
   });
 }
+
+/* ── Admin Profile ────────────────────────────── */
+
+/** Open the profile edit modal */
+function openProfileModal() {
+  const admin = getAdmin();
+  if (!admin) return;
+
+  document.getElementById('profileEmail').value = admin.email;
+  document.getElementById('profilePassword').value = '';
+  openModal('profileModal');
+}
+
+/** Save admin profile changes */
+async function saveProfile() {
+  const email = document.getElementById('profileEmail').value.trim();
+  const password = document.getElementById('profilePassword').value;
+
+  if (!email) {
+    showToast('Email address is required', 'error');
+    return;
+  }
+
+  const data = { email };
+  if (password) {
+    data.password = password;
+  }
+
+  const result = await authFetch('/auth/profile', {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+
+  if (result && result.success) {
+    showToast(result.message || 'Profile updated successfully!');
+    
+    // Update local storage data
+    const currentAdmin = getAdmin() || {};
+    currentAdmin.email = result.data.admin.email;
+    localStorage.setItem(ADMIN_KEY, JSON.stringify(currentAdmin));
+
+    // Update UI elements
+    const emailEl = document.getElementById('adminEmail');
+    const avatarEl = document.getElementById('adminAvatar');
+    if (emailEl) emailEl.textContent = result.data.admin.email;
+    if (avatarEl) avatarEl.textContent = result.data.admin.email.charAt(0).toUpperCase();
+
+    closeModal('profileModal');
+
+    // If password was updated, force re-login for security
+    if (password) {
+      showToast('Password changed. Redirecting to login...', 'success');
+      setTimeout(() => logout(), 1500);
+    }
+  } else {
+    showToast(result?.message || 'Failed to update profile', 'error');
+  }
+}

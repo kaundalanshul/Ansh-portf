@@ -5,7 +5,7 @@
  * Shared between login page and dashboard.
  */
 
-const API_BASE = '/api';
+const API_BASE = 'http://localhost:5000/api';
 const TOKEN_KEY = 'portfolio_admin_token';
 const ADMIN_KEY = 'portfolio_admin_data';
 
@@ -37,7 +37,7 @@ function getAdmin() {
 function logout() {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(ADMIN_KEY);
-  window.location.href = '/admin/';
+  window.location.href = '/';
 }
 
 /** Check if a JWT token is expired */
@@ -92,7 +92,7 @@ async function authFetch(endpoint, options = {}) {
 function redirectIfLoggedIn() {
   const token = getToken();
   if (token && !isTokenExpired(token)) {
-    window.location.href = '/admin/dashboard.html';
+    window.location.href = '/dashboard.html';
   }
 }
 
@@ -143,7 +143,7 @@ if (loginForm) {
       if (result.success) {
         // Store auth data and redirect
         setAuth(result.data.token, result.data.admin);
-        window.location.href = '/admin/dashboard.html';
+        window.location.href = '/dashboard.html';
       } else {
         loginStatus.className = 'form-status error';
         loginStatus.textContent = result.message || 'Login failed';

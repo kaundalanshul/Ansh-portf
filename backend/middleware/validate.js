@@ -140,10 +140,24 @@ const validateMessage = [
   handleValidationErrors,
 ];
 
+/** Profile update validation */
+const validateProfileUpdate = [
+  body('email')
+    .isEmail()
+    .withMessage('Please provide a valid email')
+    .normalizeEmail(),
+  body('password')
+    .optional({ values: 'falsy' })
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 characters'),
+  handleValidationErrors,
+];
+
 module.exports = {
   validateLogin,
   validateProject,
   validateSkill,
   validateMessage,
+  validateProfileUpdate,
   handleValidationErrors,
 };
