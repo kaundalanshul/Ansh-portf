@@ -65,11 +65,17 @@ function switchSection(section) {
   // Update page title
   const titles = {
     overview: 'Overview',
-    projects: 'Projects',
-    skills: 'Skills',
-    messages: 'Messages',
+    projects: 'Manage Projects',
+    skills: 'Manage Skills',
+    messages: 'Contact Messages',
+    'site-profile': 'Site Content & Profile',
   };
-  document.getElementById('pageTitle').textContent = titles[section] || 'Dashboard';
+  const titleEl = document.getElementById('pageTitle');
+  if (titleEl) titleEl.textContent = titles[section] || 'Dashboard';
+
+  if (section === 'site-profile') {
+    loadSiteProfileSettings();
+  }
 
   // Close mobile sidebar
   document.getElementById('sidebar').classList.remove('active');
@@ -228,12 +234,50 @@ function renderProjectsTable() {
     .join('');
 }
 
+/** Handle photo file upload via FileReader */
+function handlePhotoUpload(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const dataUrl = e.target.result;
+    const urlInput = document.getElementById('projectImageUrl');
+    if (urlInput) {
+      urlInput.value = dataUrl;
+      updatePhotoPreview();
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+/** Update photo preview thumbnail */
+function updatePhotoPreview() {
+  const urlInput = document.getElementById('projectImageUrl');
+  const previewContainer = document.getElementById('photoPreviewContainer');
+  const previewImg = document.getElementById('photoPreviewImg');
+
+  if (!urlInput || !previewContainer || !previewImg) return;
+
+  const url = urlInput.value.trim();
+  if (url) {
+    previewImg.src = url;
+    previewContainer.style.display = 'block';
+  } else {
+    previewImg.src = '';
+    previewContainer.style.display = 'none';
+  }
+}
+
 /** Open project modal for adding */
 function openProjectModal() {
   document.getElementById('projectModalTitle').textContent = 'Add Project';
   document.getElementById('projectForm').reset();
   document.getElementById('projectId').value = '';
   document.getElementById('projectOrder').value = '0';
+  const fileInput = document.getElementById('projectPhotoFile');
+  if (fileInput) fileInput.value = '';
+  updatePhotoPreview();
   openModal('projectModal');
 }
 
@@ -252,6 +296,9 @@ function editProject(id) {
   document.getElementById('projectGithubUrl').value = project.githubUrl || '';
   document.getElementById('projectFeatured').checked = project.featured;
   document.getElementById('projectOrder').value = project.order || 0;
+  const fileInput = document.getElementById('projectPhotoFile');
+  if (fileInput) fileInput.value = '';
+  updatePhotoPreview();
 
   openModal('projectModal');
 }
@@ -623,7 +670,7 @@ async function saveProfile() {
 
   if (result && result.success) {
     showToast(result.message || 'Profile updated successfully!');
-    
+
     // Update local storage data
     const currentAdmin = getAdmin() || {};
     currentAdmin.email = result.data.admin.email;
@@ -644,5 +691,134 @@ async function saveProfile() {
     }
   } else {
     showToast(result?.message || 'Failed to update profile', 'error');
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   Site Content & Profile Settings Management
+   ══════════════════════════════════════════════════ */
+
+let currentSiteProfile = null;
+
+/** Load site profile settings from API */
+async function loadSiteProfileSettings() {
+  try {
+    const res = await fetch(`${API_BASE}/profile`);
+    const data = await res.json();
+    if (data.success && data.data) {
+      currentSiteProfile = data.data;
+      document.getElementById('siteHeroTitle').value = currentSiteProfile.heroTitle || '';
+      document.getElementById('siteHeroSubtitle').value = currentSiteProfile.heroSubtitle || '';
+      document.getElementById('siteName').value = currentSiteProfile.name || '';
+      document.getElementById('siteProfileImage').value = currentSiteProfile.profileImage || '';
+      document.getElementById('siteAboutBio').value = currentSiteProfile.aboutBio || '';
+      document.getElementById('siteAboutSpecialization').value = currentSiteProfile.aboutSpecialization || '';
+      document.getElementById('siteAboutHighlight').value = currentSiteProfile.aboutHighlight || '';
+      document.getElementById('siteContactEmail').value = currentSiteProfile.contactEmail || '';
+      document.getElementById('siteMarqueeText').value = currentSiteProfile.marqueeText || '';
+
+      renderHobbies(currentSiteProfile.hobbies || []);
+    }
+  } catch (err) {
+    showToast('Failed to load site profile settings', 'error');
+  }
+}
+
+/** Render interest/hobby rows in the admin form */
+function renderHobbies(hobbies) {
+  const container = document.getElementById('hobbiesContainer');
+  if (!container) return;
+  container.innerHTML = '';
+
+  if (!hobbies || hobbies.length === 0) {
+    container.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">No interests added yet. Click "+ Add Interest" to add one.</p>';
+    return;
+  }
+
+  hobbies.forEach((hobby, index) => {
+    addHobbyRow(hobby.title, hobby.image, hobby.num || `0${index + 1}`);
+  });
+}
+
+/** Add a new hobby input row */
+function addHobbyRow(title = '', image = '', num = '') {
+  const container = document.getElementById('hobbiesContainer');
+  if (!container) return;
+
+  // Clear empty message if present
+  if (container.querySelector('p')) {
+    container.innerHTML = '';
+  }
+
+  const row = document.createElement('div');
+  row.className = 'hobby-input-row';
+  row.style.cssText = 'display:flex; gap:12px; align-items:center; margin-bottom:12px; background:var(--bg-input); padding:12px; border-radius:8px;';
+
+  row.innerHTML = `
+    <input type="text" class="hobby-num-input" placeholder="01" value="${num}" style="width:60px;">
+    <input type="text" class="hobby-title-input" placeholder="Interest Title (e.g. MUSIC)" value="${title}" style="flex:1;">
+    <input type="text" class="hobby-image-input" placeholder="Image filename (e.g. hobby_music.jpg)" value="${image}" style="flex:1.5;">
+    <button type="button" class="btn btn-secondary" onclick="removeHobbyRow(this)" style="color:var(--accent-red,#ff5555); border-color:var(--border-color);">🗑️</button>
+  `;
+
+  container.appendChild(row);
+}
+
+/** Remove a hobby row */
+function removeHobbyRow(btn) {
+  const row = btn.closest('.hobby-input-row');
+  if (row) row.remove();
+}
+
+/** Save all site profile settings to API */
+async function saveSiteProfileSettings() {
+  const heroTitle = document.getElementById('siteHeroTitle').value;
+  const heroSubtitle = document.getElementById('siteHeroSubtitle').value;
+  const name = document.getElementById('siteName').value.trim();
+  const profileImage = document.getElementById('siteProfileImage').value.trim();
+  const aboutBio = document.getElementById('siteAboutBio').value.trim();
+  const aboutSpecialization = document.getElementById('siteAboutSpecialization').value.trim();
+  const aboutHighlight = document.getElementById('siteAboutHighlight').value.trim();
+  const contactEmail = document.getElementById('siteContactEmail').value.trim();
+  const marqueeText = document.getElementById('siteMarqueeText').value.trim();
+
+  // Collect hobbies
+  const hobbiesContainer = document.getElementById('hobbiesContainer');
+  const hobbyRows = hobbiesContainer.querySelectorAll('.hobby-input-row');
+  const hobbies = [];
+
+  hobbyRows.forEach((row, idx) => {
+    const num = row.querySelector('.hobby-num-input').value.trim() || `0${idx + 1}`;
+    const title = row.querySelector('.hobby-title-input').value.trim();
+    const image = row.querySelector('.hobby-image-input').value.trim();
+
+    if (title) {
+      hobbies.push({ num, title, image });
+    }
+  });
+
+  const payload = {
+    heroTitle,
+    heroSubtitle,
+    name,
+    profileImage,
+    aboutBio,
+    aboutSpecialization,
+    aboutHighlight,
+    contactEmail,
+    marqueeText,
+    hobbies,
+  };
+
+  const result = await authFetch('/profile', {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
+
+  if (result && result.success) {
+    showToast('Site content & profile updated successfully!', 'success');
+    currentSiteProfile = result.data;
+  } else {
+    showToast(result?.message || 'Failed to update site content', 'error');
   }
 }

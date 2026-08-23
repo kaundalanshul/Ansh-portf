@@ -65,8 +65,16 @@ const validateProject = [
     .withMessage('Technology names cannot be empty'),
   body('imageUrl')
     .optional({ values: 'falsy' })
-    .isURL()
-    .withMessage('Image URL must be a valid URL'),
+    .custom((val) => {
+      if (typeof val !== 'string') return false;
+      const trimmed = val.trim();
+      if (!trimmed) return true;
+      const isHttpUrl = /^(https?:\/\/)/i.test(trimmed);
+      const isDataUrl = /^data:image\/[a-zA-Z0-9\+\/\=]+;base64,/i.test(trimmed);
+      const isRelativePath = /^[\w\.\-\/]+$/i.test(trimmed);
+      if (isHttpUrl || isDataUrl || isRelativePath) return true;
+      throw new Error('Image URL must be a valid URL, relative path, or photo upload');
+    }),
   body('liveUrl')
     .optional({ values: 'falsy' })
     .isURL()

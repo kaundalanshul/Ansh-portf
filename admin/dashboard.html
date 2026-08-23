@@ -48,6 +48,10 @@
           <span>Messages</span>
           <span class="badge" id="unreadBadge" style="display:none;">0</span>
         </div>
+        <div class="nav-item" data-section="site-profile" onclick="switchSection('site-profile')">
+          <span class="icon">⚙️</span>
+          <span>Site Content</span>
+        </div>
       </nav>
 
       <div class="sidebar-footer">
@@ -205,6 +209,101 @@
         </div>
       </div>
 
+      <!-- ══════════════════════════════════════════
+           Site Content & Profile Settings Section
+           ══════════════════════════════════════════ -->
+      <div class="content-section" id="section-site-profile">
+        <div class="section-toolbar">
+          <h2>Site Content & Profile Settings</h2>
+          <button class="btn btn-primary" onclick="saveSiteProfileSettings()">
+            💾 Save All Changes
+          </button>
+        </div>
+
+        <form id="siteProfileForm" onsubmit="event.preventDefault(); saveSiteProfileSettings();">
+          <div class="card"
+            style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; padding:24px; margin-bottom:24px;">
+            <h3
+              style="margin-bottom:16px; color:var(--text-primary); border-bottom:1px solid var(--border-color); padding-bottom:8px;">
+              🎨 Hero Section</h3>
+            <div class="form-group">
+              <label for="siteHeroTitle">Hero Title</label>
+              <textarea id="siteHeroTitle" rows="3" placeholder="FULL STACK &\nMERN STACK\nDEVELOPER"
+                style="font-family:inherit;"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="siteHeroSubtitle">Hero Subtitle</label>
+              <textarea id="siteHeroSubtitle" rows="2"
+                placeholder="Crafting digital experiences with precision."></textarea>
+            </div>
+          </div>
+
+          <div class="card"
+            style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; padding:24px; margin-bottom:24px;">
+            <h3
+              style="margin-bottom:16px; color:var(--text-primary); border-bottom:1px solid var(--border-color); padding-bottom:8px;">
+              👤 Profile & About Section</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="siteName">Full Name</label>
+                <input type="text" id="siteName" placeholder="Anshul Kaundal">
+              </div>
+              <div class="form-group">
+                <label for="siteProfileImage">Profile Photo (Filename or URL)</label>
+                <input type="text" id="siteProfileImage" placeholder="me_pfp.jpg">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="siteAboutBio">About Paragraph 1 (Introduction)</label>
+              <textarea id="siteAboutBio" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="siteAboutSpecialization">About Paragraph 2 (Specialization & Goals)</label>
+              <textarea id="siteAboutSpecialization" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="siteAboutHighlight">Highlight Quote / Motto</label>
+              <input type="text" id="siteAboutHighlight"
+                placeholder="Building. Learning. Creating. One project at a time.">
+            </div>
+          </div>
+
+          <div class="card"
+            style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; padding:24px; margin-bottom:24px;">
+            <div
+              style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:8px; margin-bottom:16px;">
+              <h3 style="color:var(--text-primary); margin:0;">💡 Interests & Hobbies</h3>
+              <button type="button" class="btn btn-secondary" onclick="addHobbyRow()">+ Add Interest</button>
+            </div>
+            <div id="hobbiesContainer">
+              <!-- Dynamic hobby items -->
+            </div>
+          </div>
+
+          <div class="card"
+            style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; padding:24px; margin-bottom:24px;">
+            <h3
+              style="margin-bottom:16px; color:var(--text-primary); border-bottom:1px solid var(--border-color); padding-bottom:8px;">
+              📬 Contact & Footer</h3>
+            <div class="form-group">
+              <label for="siteContactEmail">Contact Section Email</label>
+              <input type="email" id="siteContactEmail" placeholder="kaundalanshul725@gmail.com">
+            </div>
+            <div class="form-group">
+              <label for="siteMarqueeText">Footer Marquee Text</label>
+              <input type="text" id="siteMarqueeText"
+                placeholder="ANSHUL KAUNDAL PORTFOLIO © 2026 ◆ FULL STACK DEVELOPER ◆ AVAILABLE FOR WORK">
+            </div>
+          </div>
+
+          <div style="text-align:right; margin-bottom:40px;">
+            <button type="submit" class="btn btn-primary" style="padding:12px 32px; font-size:1rem;">
+              💾 Save All Changes
+            </button>
+          </div>
+        </form>
+      </div>
+
     </main>
   </div>
 
@@ -236,25 +335,28 @@
             <input type="text" id="projectTechnologies" placeholder="React, Node.js, MongoDB" required>
           </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label for="projectImageUrl">Image URL</label>
-              <input type="url" id="projectImageUrl" placeholder="https://...">
+          <div class="form-group">
+            <label for="projectPhotoFile">📷 Upload Photo Directly</label>
+            <input type="file" id="projectPhotoFile" accept="image/*" onchange="handlePhotoUpload(event)">
+            <input type="hidden" id="projectImageUrl">
+            <div id="photoPreviewContainer" style="display: none; margin-top: 10px; text-align: center;">
+              <img id="photoPreviewImg" src="" alt="Photo Preview" style="max-height: 140px; border-radius: 8px; border: 1px solid var(--border-color);">
             </div>
-            <div class="form-group">
-              <label for="projectOrder">Order</label>
-              <input type="number" id="projectOrder" placeholder="0" min="0" value="0">
-            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="projectLiveUrl">🌐 Live Project Link / URL (placed below photo)</label>
+            <input type="url" id="projectLiveUrl" placeholder="https://my-live-project.com">
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label for="projectLiveUrl">Live Demo URL</label>
-              <input type="url" id="projectLiveUrl" placeholder="https://...">
-            </div>
-            <div class="form-group">
               <label for="projectGithubUrl">GitHub URL</label>
               <input type="url" id="projectGithubUrl" placeholder="https://github.com/...">
+            </div>
+            <div class="form-group">
+              <label for="projectOrder">Order</label>
+              <input type="number" id="projectOrder" placeholder="0" min="0" value="0">
             </div>
           </div>
 
