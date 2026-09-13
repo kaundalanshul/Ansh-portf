@@ -17,17 +17,13 @@ const projectSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      required: [true, 'Project description is required'],
       trim: true,
+      default: '',
       maxlength: [1000, 'Description cannot exceed 1000 characters'],
     },
     technologies: {
       type: [String],
-      required: [true, 'At least one technology is required'],
-      validate: {
-        validator: (arr) => arr.length > 0,
-        message: 'At least one technology must be specified',
-      },
+      default: [],
     },
     imageUrl: {
       type: String,

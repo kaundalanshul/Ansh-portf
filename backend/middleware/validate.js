@@ -50,19 +50,17 @@ const validateProject = [
     .isLength({ max: 100 })
     .withMessage('Title cannot exceed 100 characters'),
   body('description')
+    .optional({ values: 'falsy' })
     .trim()
-    .notEmpty()
-    .withMessage('Description is required')
     .isLength({ max: 1000 })
     .withMessage('Description cannot exceed 1000 characters'),
   body('technologies')
-    .isArray({ min: 1 })
-    .withMessage('At least one technology is required'),
-  body('technologies.*')
-    .isString()
-    .trim()
-    .notEmpty()
-    .withMessage('Technology names cannot be empty'),
+    .optional()
+    .custom((val) => {
+      if (val === undefined || val === null || val === '') return true;
+      if (!Array.isArray(val)) throw new Error('Technologies must be an array');
+      return true;
+    }),
   body('imageUrl')
     .optional({ values: 'falsy' })
     .custom((val) => {
@@ -70,25 +68,31 @@ const validateProject = [
       const trimmed = val.trim();
       if (!trimmed) return true;
       const isHttpUrl = /^(https?:\/\/)/i.test(trimmed);
-      const isDataUrl = /^data:image\/[a-zA-Z0-9\+\/\=]+;base64,/i.test(trimmed);
-      const isRelativePath = /^[\w\.\-\/]+$/i.test(trimmed);
-      if (isHttpUrl || isDataUrl || isRelativePath) return true;
-      throw new Error('Image URL must be a valid URL, relative path, or photo upload');
+      const isDataUrl = /^data:image\/[a-zA-Z0-9\+\/\=\-\_\.]+;base64,/i.test(trimmed);
+      // Allow relative paths, image filenames with spaces/extensions
+      const isPathOrFilename = /^[\w\.\-\/\s\\]+$/i.test(trimmed);
+      if (isHttpUrl || isDataUrl || isPathOrFilename) return true;
+      return true; // Graceful fallback
     }),
   body('liveUrl')
     .optional({ values: 'falsy' })
-    .isURL()
-    .withMessage('Live URL must be a valid URL'),
+    .custom((val) => {
+      if (!val || typeof val !== 'string' || !val.trim()) return true;
+      return true;
+    }),
   body('githubUrl')
     .optional({ values: 'falsy' })
-    .isURL()
-    .withMessage('GitHub URL must be a valid URL'),
+    .custom((val) => {
+      if (!val || typeof val !== 'string' || !val.trim()) return true;
+      return true;
+    }),
   body('featured')
     .optional()
     .isBoolean()
     .withMessage('Featured must be a boolean'),
   body('order')
     .optional()
+    .customSanitizer(val => val === '' || val === null ? 0 : val)
     .isInt({ min: 0 })
     .withMessage('Order must be a non-negative integer'),
   handleValidationErrors,
@@ -103,11 +107,12 @@ const validateSkill = [
     .isLength({ max: 50 })
     .withMessage('Name cannot exceed 50 characters'),
   body('category')
-    .notEmpty()
-    .withMessage('Category is required')
+    .optional({ values: 'falsy' })
     .isIn(['Frontend', 'Backend', 'Tools', 'Other'])
     .withMessage('Category must be Frontend, Backend, Tools, or Other'),
   body('proficiency')
+    .optional({ values: 'falsy' })
+    .customSanitizer(val => val === '' || val === null ? 50 : val)
     .isInt({ min: 1, max: 100 })
     .withMessage('Proficiency must be between 1 and 100'),
   body('icon')
@@ -116,6 +121,7 @@ const validateSkill = [
     .trim(),
   body('order')
     .optional()
+    .customSanitizer(val => val === '' || val === null ? 0 : val)
     .isInt({ min: 0 })
     .withMessage('Order must be a non-negative integer'),
   handleValidationErrors,

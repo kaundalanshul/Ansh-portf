@@ -139,6 +139,7 @@
             <thead>
               <tr>
                 <th>Title</th>
+                <th>Live Website (Preview)</th>
                 <th>Technologies</th>
                 <th>Featured</th>
                 <th>Order</th>
@@ -317,7 +318,7 @@
         <button class="modal-close" onclick="closeModal('projectModal')">✕</button>
       </div>
       <div class="modal-body">
-        <form id="projectForm">
+        <form id="projectForm" onsubmit="event.preventDefault(); saveProject();">
           <input type="hidden" id="projectId">
 
           <div class="form-group">
@@ -326,33 +327,44 @@
           </div>
 
           <div class="form-group">
-            <label for="projectDescription">Description *</label>
-            <textarea id="projectDescription" placeholder="Brief description of the project..." required></textarea>
+            <label for="projectDescription">Description (optional)</label>
+            <textarea id="projectDescription" placeholder="Brief description of the project (can complete later)..."></textarea>
           </div>
 
           <div class="form-group">
-            <label for="projectTechnologies">Technologies * (comma separated)</label>
-            <input type="text" id="projectTechnologies" placeholder="React, Node.js, MongoDB" required>
+            <label for="projectTechnologies">Technologies (optional, comma separated)</label>
+            <input type="text" id="projectTechnologies" placeholder="React, Node.js, MongoDB">
           </div>
 
           <div class="form-group">
-            <label for="projectPhotoFile">📷 Upload Photo Directly</label>
-            <input type="file" id="projectPhotoFile" accept="image/*" onchange="handlePhotoUpload(event)">
-            <input type="hidden" id="projectImageUrl">
-            <div id="photoPreviewContainer" style="display: none; margin-top: 10px; text-align: center;">
-              <img id="photoPreviewImg" src="" alt="Photo Preview" style="max-height: 140px; border-radius: 8px; border: 1px solid var(--border-color);">
+            <label for="projectLiveUrl">🌐 Live Website URL (Powers Portfolio Live Preview & "Open Live Site" Button)</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="projectLiveUrl" placeholder="https://grocerystore-3zcf.onrender.com/" style="flex: 1;">
+              <button type="button" class="btn btn-secondary" onclick="testLiveUrl()" title="Test link in new tab" style="white-space: nowrap;">🔗 Test Link</button>
             </div>
+            <small style="color: var(--text-muted); font-size: 0.8rem; display: block; margin-top: 4px;">
+              💡 Enter your deployed website URL. It will automatically load as an interactive live preview (iframe) in your portfolio with an "Open Live Site" button.
+            </small>
           </div>
 
           <div class="form-group">
-            <label for="projectLiveUrl">🌐 Live Project Link / URL (placed below photo)</label>
-            <input type="url" id="projectLiveUrl" placeholder="https://my-live-project.com">
+            <label for="projectImageUrl">Project Image / Screenshot (Optional)</label>
+            <input type="text" id="projectImageUrl" placeholder="Image filename (e.g. me_pfp.jpg) or image URL" oninput="updatePhotoPreview()">
+          </div>
+
+          <div class="form-group">
+            <label for="projectPhotoFile">📷 Or Upload Project Photo Directly (Optional, works even if other fields are empty)</label>
+            <input type="file" id="projectPhotoFile" accept="image/*" onchange="handlePhotoUpload(event)">
+            <div id="photoPreviewContainer" style="display: none; margin-top: 10px; text-align: center;">
+              <img id="photoPreviewImg" src="" alt="Photo Preview" style="max-height: 140px; border-radius: 8px; border: 1px solid var(--border-color); display: block; margin: 0 auto 6px;">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="clearPhoto()" style="margin: 0 auto; display: inline-block;">✕ Remove Photo</button>
+            </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label for="projectGithubUrl">GitHub URL</label>
-              <input type="url" id="projectGithubUrl" placeholder="https://github.com/...">
+              <label for="projectGithubUrl">GitHub URL (optional)</label>
+              <input type="text" id="projectGithubUrl" placeholder="https://github.com/...">
             </div>
             <div class="form-group">
               <label for="projectOrder">Order</label>
@@ -384,7 +396,7 @@
         <button class="modal-close" onclick="closeModal('skillModal')">✕</button>
       </div>
       <div class="modal-body">
-        <form id="skillForm">
+        <form id="skillForm" onsubmit="event.preventDefault(); saveSkill();">
           <input type="hidden" id="skillId">
 
           <div class="form-row">
@@ -393,9 +405,8 @@
               <input type="text" id="skillName" placeholder="JavaScript" required>
             </div>
             <div class="form-group">
-              <label for="skillCategory">Category *</label>
-              <select id="skillCategory" required>
-                <option value="">Select category</option>
+              <label for="skillCategory">Category</label>
+              <select id="skillCategory">
                 <option value="Frontend">Frontend</option>
                 <option value="Backend">Backend</option>
                 <option value="Tools">Tools</option>
@@ -406,8 +417,8 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label for="skillProficiency">Proficiency (1-100) *</label>
-              <input type="number" id="skillProficiency" placeholder="85" min="1" max="100" required>
+              <label for="skillProficiency">Proficiency (1-100, optional)</label>
+              <input type="number" id="skillProficiency" placeholder="85" min="1" max="100" value="50">
             </div>
             <div class="form-group">
               <label for="skillOrder">Order</label>
@@ -487,7 +498,7 @@
         <button class="modal-close" onclick="closeModal('profileModal')">✕</button>
       </div>
       <div class="modal-body">
-        <form id="profileForm">
+        <form id="profileForm" onsubmit="event.preventDefault(); saveProfile();">
           <div class="form-group">
             <label for="profileEmail">Email Address *</label>
             <input type="email" id="profileEmail" required autocomplete="email">

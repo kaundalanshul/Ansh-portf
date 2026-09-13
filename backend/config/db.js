@@ -15,11 +15,12 @@ const connectDB = async () => {
     let uri = process.env.MONGO_URI;
 
     // Try connecting to the configured URI first
-    // If it fails, fall back to in-memory MongoDB
+    // Use 30s timeout to allow Atlas DNS SRV resolution and TLS handshake
     try {
-      await mongoose.connect(uri, { serverSelectionTimeoutMS: 3000 });
+      await mongoose.connect(uri, { serverSelectionTimeoutMS: 30000, connectTimeoutMS: 30000 });
     } catch (connError) {
       console.warn('⚠️  Could not connect to MongoDB at:', uri);
+      console.warn(`⚠️  Error detail: ${connError.message}`);
       console.log('📦 Starting in-memory MongoDB for development...');
 
       const { MongoMemoryServer } = require('mongodb-memory-server');
@@ -31,7 +32,7 @@ const connectDB = async () => {
       console.log('   Install MongoDB locally or use Atlas for persistent storage.');
     }
 
-    console.log(`✅ MongoDB connected: ${mongoose.connection.host}`);
+    console.log(`✅ MongoDB connected: ${mongoose.connection.host} (Database: ${mongoose.connection.name})`);
 
     // Connection event listeners for monitoring
     mongoose.connection.on('error', (err) => {

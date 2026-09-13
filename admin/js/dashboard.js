@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /** Load all data concurrently */
 async function loadDashboardData() {
-  await Promise.all([loadProjects(), loadSkills(), loadMessages()]);
+  await Promise.all([loadProjects(), loadSkills(), loadMessages(), loadSiteProfileSettings()]);
   updateStats();
 }
 
@@ -199,7 +199,7 @@ function renderProjectsTable() {
   if (projects.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="5">
+        <td colspan="6">
           <div class="table-empty">
             <div class="icon">📂</div>
             <p>No projects yet. Click "Add Project" to get started.</p>
@@ -216,8 +216,19 @@ function renderProjectsTable() {
       <tr>
         <td><strong style="color:var(--text-primary)">${escapeHTML(p.title)}</strong></td>
         <td>
+          ${p.liveUrl
+            ? `<a href="${/^https?:\/\//i.test(p.liveUrl) ? p.liveUrl : 'https://' + p.liveUrl}" target="_blank" rel="noopener noreferrer" style="color:var(--accent-primary, #3b82f6); font-weight:600; text-decoration:none; font-size:0.82rem; display:inline-flex; align-items:center; gap:5px;" title="${escapeHTML(p.liveUrl)}">
+                <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#10b981;"></span>
+                <span>Live Preview ↗</span>
+              </a>`
+            : '<span style="color:var(--text-muted);font-size:0.8rem;">—</span>'
+          }
+        </td>
+        <td>
           <div class="table-tech-tags">
-            ${p.technologies.map((t) => `<span>${escapeHTML(t)}</span>`).join('')}
+            ${p.technologies && p.technologies.length > 0
+              ? p.technologies.map((t) => `<span>${escapeHTML(t)}</span>`).join('')
+              : '<span style="color:var(--text-muted);font-size:0.75rem;">None</span>'}
           </div>
         </td>
         <td>${p.featured ? '<span class="badge badge-featured">Featured</span>' : '—'}</td>
@@ -225,13 +236,35 @@ function renderProjectsTable() {
         <td>
           <div class="actions">
             <button class="btn btn-secondary btn-sm" onclick="editProject('${p._id}')">✏️ Edit</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteProject('${p._id}', '${escapeHTML(p.title)}')">🗑️</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteProject('${p._id}')">🗑️</button>
           </div>
         </td>
       </tr>
     `
     )
     .join('');
+}
+
+/** Test live URL in a new browser tab */
+function testLiveUrl() {
+  const input = document.getElementById('projectLiveUrl');
+  if (!input) return;
+  const url = input.value.trim();
+  if (!url) {
+    showToast('Please enter a live website URL first', 'error');
+    return;
+  }
+  const fullUrl = /^https?:\/\//i.test(url) ? url : 'https://' + url;
+  window.open(fullUrl, '_blank', 'noopener,noreferrer');
+}
+
+/** Clear photo selection */
+function clearPhoto() {
+  const urlInput = document.getElementById('projectImageUrl');
+  const fileInput = document.getElementById('projectPhotoFile');
+  if (urlInput) urlInput.value = '';
+  if (fileInput) fileInput.value = '';
+  updatePhotoPreview();
 }
 
 /** Handle photo file upload via FileReader */
@@ -288,13 +321,13 @@ function editProject(id) {
 
   document.getElementById('projectModalTitle').textContent = 'Edit Project';
   document.getElementById('projectId').value = project._id;
-  document.getElementById('projectTitle').value = project.title;
-  document.getElementById('projectDescription').value = project.description;
-  document.getElementById('projectTechnologies').value = project.technologies.join(', ');
+  document.getElementById('projectTitle').value = project.title || '';
+  document.getElementById('projectDescription').value = project.description || '';
+  document.getElementById('projectTechnologies').value = (project.technologies || []).join(', ');
   document.getElementById('projectImageUrl').value = project.imageUrl || '';
   document.getElementById('projectLiveUrl').value = project.liveUrl || '';
   document.getElementById('projectGithubUrl').value = project.githubUrl || '';
-  document.getElementById('projectFeatured').checked = project.featured;
+  document.getElementById('projectFeatured').checked = !!project.featured;
   document.getElementById('projectOrder').value = project.order || 0;
   const fileInput = document.getElementById('projectPhotoFile');
   if (fileInput) fileInput.value = '';
@@ -311,17 +344,17 @@ async function saveProject() {
   const data = {
     title: document.getElementById('projectTitle').value.trim(),
     description: document.getElementById('projectDescription').value.trim(),
-    technologies: techInput.split(',').map((t) => t.trim()).filter(Boolean),
-    imageUrl: document.getElementById('projectImageUrl').value.trim() || undefined,
-    liveUrl: document.getElementById('projectLiveUrl').value.trim() || undefined,
-    githubUrl: document.getElementById('projectGithubUrl').value.trim() || undefined,
+    technologies: techInput ? techInput.split(',').map((t) => t.trim()).filter(Boolean) : [],
+    imageUrl: document.getElementById('projectImageUrl').value.trim(),
+    liveUrl: document.getElementById('projectLiveUrl').value.trim(),
+    githubUrl: document.getElementById('projectGithubUrl').value.trim(),
     featured: document.getElementById('projectFeatured').checked,
     order: parseInt(document.getElementById('projectOrder').value) || 0,
   };
 
-  // Basic client-side validation
-  if (!data.title || !data.description || data.technologies.length === 0) {
-    showToast('Please fill in all required fields', 'error');
+  // Only title is strictly required; allow saving partial/incomplete projects
+  if (!data.title) {
+    showToast('Project title is required', 'error');
     return;
   }
 
@@ -346,13 +379,16 @@ async function saveProject() {
     await loadProjects();
     updateStats();
   } else {
-    const msg = result?.message || result?.errors?.map((e) => e.message).join(', ') || 'Failed to save project';
+    const errorDetail = result?.errors?.map((e) => e.message).join(', ');
+    const msg = errorDetail || result?.message || 'Failed to save project';
     showToast(msg, 'error');
   }
 }
 
 /** Delete a project */
-function deleteProject(id, title) {
+function deleteProject(id) {
+  const project = projects.find((p) => p._id === id);
+  const title = project ? project.title : 'this project';
   confirmDelete(`Delete project "${title}"?`, async () => {
     const result = await authFetch(`/projects/${id}`, { method: 'DELETE' });
     if (result && result.success) {
@@ -415,7 +451,7 @@ function renderSkillsTable() {
         <td>
           <div class="actions">
             <button class="btn btn-secondary btn-sm" onclick="editSkill('${s._id}')">✏️ Edit</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteSkill('${s._id}', '${escapeHTML(s.name)}')">🗑️</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteSkill('${s._id}')">🗑️</button>
           </div>
         </td>
       </tr>
@@ -430,6 +466,8 @@ function openSkillModal() {
   document.getElementById('skillForm').reset();
   document.getElementById('skillId').value = '';
   document.getElementById('skillOrder').value = '0';
+  document.getElementById('skillProficiency').value = '50';
+  document.getElementById('skillCategory').value = 'Frontend';
   openModal('skillModal');
 }
 
@@ -440,9 +478,9 @@ function editSkill(id) {
 
   document.getElementById('skillModalTitle').textContent = 'Edit Skill';
   document.getElementById('skillId').value = skill._id;
-  document.getElementById('skillName').value = skill.name;
-  document.getElementById('skillCategory').value = skill.category;
-  document.getElementById('skillProficiency').value = skill.proficiency;
+  document.getElementById('skillName').value = skill.name || '';
+  document.getElementById('skillCategory').value = skill.category || 'Other';
+  document.getElementById('skillProficiency').value = skill.proficiency ?? 50;
   document.getElementById('skillIcon').value = skill.icon || '';
   document.getElementById('skillOrder').value = skill.order || 0;
 
@@ -455,15 +493,15 @@ async function saveSkill() {
 
   const data = {
     name: document.getElementById('skillName').value.trim(),
-    category: document.getElementById('skillCategory').value,
-    proficiency: parseInt(document.getElementById('skillProficiency').value),
-    icon: document.getElementById('skillIcon').value.trim() || undefined,
+    category: document.getElementById('skillCategory').value || 'Other',
+    proficiency: parseInt(document.getElementById('skillProficiency').value) || 50,
+    icon: document.getElementById('skillIcon').value.trim(),
     order: parseInt(document.getElementById('skillOrder').value) || 0,
   };
 
-  // Basic client-side validation
-  if (!data.name || !data.category || !data.proficiency) {
-    showToast('Please fill in all required fields', 'error');
+  // Only name is strictly required
+  if (!data.name) {
+    showToast('Skill name is required', 'error');
     return;
   }
 
@@ -486,13 +524,16 @@ async function saveSkill() {
     await loadSkills();
     updateStats();
   } else {
-    const msg = result?.message || result?.errors?.map((e) => e.message).join(', ') || 'Failed to save skill';
+    const errorDetail = result?.errors?.map((e) => e.message).join(', ');
+    const msg = errorDetail || result?.message || 'Failed to save skill';
     showToast(msg, 'error');
   }
 }
 
 /** Delete a skill */
-function deleteSkill(id, name) {
+function deleteSkill(id) {
+  const skill = skills.find((s) => s._id === id);
+  const name = skill ? skill.name : 'this skill';
   confirmDelete(`Delete skill "${name}"?`, async () => {
     const result = await authFetch(`/skills/${id}`, { method: 'DELETE' });
     if (result && result.success) {

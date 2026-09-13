@@ -16,7 +16,7 @@ const skillSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      required: [true, 'Category is required'],
+      default: 'Other',
       enum: {
         values: ['Frontend', 'Backend', 'Tools', 'Other'],
         message: 'Category must be Frontend, Backend, Tools, or Other',
@@ -24,7 +24,7 @@ const skillSchema = new mongoose.Schema(
     },
     proficiency: {
       type: Number,
-      required: [true, 'Proficiency level is required'],
+      default: 50,
       min: [1, 'Proficiency must be at least 1'],
       max: [100, 'Proficiency cannot exceed 100'],
     },

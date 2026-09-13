@@ -100,29 +100,106 @@ function renderProjects(projects) {
     `;
     indexContainer.insertAdjacentHTML('beforeend', indexHTML);
 
-    // Gallery Item
-    const imgHtml = proj.imageUrl
-      ? `<img src="${proj.imageUrl}" class="project-image" alt="${proj.title}" style="margin-bottom: 0.75rem;">`
-      : `<div class="project-image" style="display:flex;align-items:center;justify-content:center;font-family:monospace;margin-bottom:0.75rem;">NO PHOTO</div>`;
+    const liveHref = proj.liveUrl
+      ? (/^https?:\/\//i.test(proj.liveUrl) ? proj.liveUrl : 'https://' + proj.liveUrl)
+      : '';
 
-    const liveLinkBelowPhoto = proj.liveUrl
+    // If project has liveUrl, render live interactive preview frame; otherwise render image
+    let previewHtml = '';
+    if (liveHref) {
+      const hasImage = !!proj.imageUrl;
+      const modeToggleHtml = hasImage
+        ? `<div class="mode-toggle">
+            <button type="button" class="mode-btn active" data-mode="live" onclick="togglePreviewMode('${proj._id}', 'live')" title="Interactive Live Preview">Live</button>
+            <button type="button" class="mode-btn" data-mode="image" onclick="togglePreviewMode('${proj._id}', 'image')" title="Static Screenshot">Photo</button>
+           </div>`
+        : '';
+
+      const imagePreviewHtml = hasImage
+        ? `<div class="preview-image-wrapper" style="display:none;">
+             <img src="${proj.imageUrl}" class="project-image" alt="${proj.title}" style="margin: 0; border-radius: 0; aspect-ratio: 16/10; object-fit: cover;">
+           </div>`
+        : '';
+
+      previewHtml = `
+        <div class="live-preview-container" id="preview-${proj._id}">
+          <div class="preview-browser-header">
+            <div class="browser-window-dots">
+              <span class="dot dot-red"></span>
+              <span class="dot dot-yellow"></span>
+              <span class="dot dot-green"></span>
+            </div>
+            <div class="preview-address-bar">
+              <span class="lock-icon">🔒</span>
+              <span class="address-text">${liveHref}</span>
+            </div>
+            <div class="preview-controls">
+              ${modeToggleHtml}
+              <div class="device-toggle" role="group" aria-label="Device View">
+                <button type="button" class="device-btn active" data-device="desktop" onclick="setPreviewDevice('${proj._id}', 'desktop')" title="Desktop View">🖥️ Desktop</button>
+                <button type="button" class="device-btn" data-device="mobile" onclick="setPreviewDevice('${proj._id}', 'mobile')" title="Mobile View">📱 Mobile</button>
+              </div>
+              <a href="${liveHref}" target="_blank" rel="noopener noreferrer" class="btn-open-live">
+                Open Live Site ↗
+              </a>
+            </div>
+          </div>
+          <div class="preview-viewport-wrapper">
+            <div class="preview-device-screen desktop" id="screen-${proj._id}">
+              <iframe
+                src="${liveHref}"
+                class="preview-iframe"
+                id="iframe-${proj._id}"
+                title="${proj.title} Live Preview"
+                loading="lazy"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              ></iframe>
+            </div>
+          </div>
+          ${imagePreviewHtml}
+          <div class="preview-footer">
+            <span class="preview-status"><span class="pulse-dot"></span> Live Interactive Preview</span>
+            <a href="${liveHref}" target="_blank" rel="noopener noreferrer" class="btn-open-live-full">
+              Open Live Site [ ↗ ]
+            </a>
+          </div>
+        </div>
+      `;
+    } else {
+      previewHtml = proj.imageUrl
+        ? `<img src="${proj.imageUrl}" class="project-image" alt="${proj.title}" style="margin-bottom: 1.5rem;" onerror="this.onerror=null;this.src='';this.alt='Photo Not Found';">`
+        : `<div class="project-image" style="display:flex;align-items:center;justify-content:center;font-family:monospace;margin-bottom:1.5rem;">NO PHOTO</div>`;
+    }
+
+    const liveLinkBelowPhoto = liveHref
       ? `<div class="live-link-below-photo" style="margin-bottom: 1.5rem;">
-          <a href="${proj.liveUrl}" target="_blank" class="btn-view" style="font-weight: 800; font-size: 0.95rem; word-break: break-all;">
-            🔗 Live Project: ${proj.liveUrl} ↗
+          <a href="${liveHref}" target="_blank" rel="noopener noreferrer" class="btn-view" style="font-weight: 800; font-size: 0.95rem; word-break: break-all;">
+            🔗 Open Live Site: ${proj.liveUrl} ↗
           </a>
         </div>`
       : '';
 
-    const techHtml = proj.technologies.map(t => `<span class="tech-tag">${t}</span>`).join('');
+    const descHtml = proj.description ? `<p>${proj.description}</p>` : '';
+    const techHtml = (proj.technologies && proj.technologies.length > 0)
+      ? `<div class="tech-tags">${proj.technologies.map(t => `<span class="tech-tag">${t}</span>`).join('')}</div>`
+      : '';
+
+    const githubHref = proj.githubUrl
+      ? (/^https?:\/\//i.test(proj.githubUrl) ? proj.githubUrl : 'https://' + proj.githubUrl)
+      : '';
+    const githubLink = githubHref
+      ? `<a href="${githubHref}" target="_blank" rel="noopener noreferrer" class="btn-view">[ SOURCE CODE ]</a>`
+      : '';
 
     const galleryHTML = `
       <div class="project-showcase" id="proj-${proj._id}">
-        ${imgHtml}
+        ${previewHtml}
         ${liveLinkBelowPhoto}
         <h3>${proj.title}</h3>
-        <p>${proj.description}</p>
-        <div class="tech-tags">${techHtml}</div>
-        ${proj.githubUrl ? `<a href="${proj.githubUrl}" target="_blank" class="btn-view">[ SOURCE CODE ]</a>` : ''}
+        ${descHtml}
+        ${techHtml}
+        ${githubLink}
       </div>
     `;
     galleryContainer.insertAdjacentHTML('beforeend', galleryHTML);
@@ -356,3 +433,47 @@ function renderFrontendHobbies(hobbies) {
     </div>
   `).join('');
 }
+
+/* ── Live Preview Device and Mode Switchers ─────── */
+window.setPreviewDevice = function(projId, device) {
+  const container = document.getElementById(`preview-${projId}`);
+  if (!container) return;
+
+  const screen = container.querySelector('.preview-device-screen');
+  const desktopBtn = container.querySelector('.device-btn[data-device="desktop"]');
+  const mobileBtn = container.querySelector('.device-btn[data-device="mobile"]');
+
+  if (device === 'mobile') {
+    screen.classList.remove('desktop');
+    screen.classList.add('mobile');
+    desktopBtn?.classList.remove('active');
+    mobileBtn?.classList.add('active');
+  } else {
+    screen.classList.remove('mobile');
+    screen.classList.add('desktop');
+    mobileBtn?.classList.remove('active');
+    desktopBtn?.classList.add('active');
+  }
+};
+
+window.togglePreviewMode = function(projId, mode) {
+  const container = document.getElementById(`preview-${projId}`);
+  if (!container) return;
+
+  const liveView = container.querySelector('.preview-viewport-wrapper');
+  const imageView = container.querySelector('.preview-image-wrapper');
+  const liveBtn = container.querySelector('.mode-btn[data-mode="live"]');
+  const imgBtn = container.querySelector('.mode-btn[data-mode="image"]');
+
+  if (mode === 'image' && imageView) {
+    liveView.style.display = 'none';
+    imageView.style.display = 'block';
+    liveBtn?.classList.remove('active');
+    imgBtn?.classList.add('active');
+  } else {
+    if (imageView) imageView.style.display = 'none';
+    liveView.style.display = 'flex';
+    imgBtn?.classList.remove('active');
+    liveBtn?.classList.add('active');
+  }
+};
