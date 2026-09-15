@@ -478,3 +478,25 @@ window.togglePreviewMode = function(projId, mode) {
     liveBtn?.classList.add('active');
   }
 };
+
+/* ── Mobile Hamburger Menu ──────────────────────── */
+(function initMobileMenu() {
+  const hamburger = document.getElementById('navHamburger');
+  const overlay = document.getElementById('mobileNavOverlay');
+  if (!hamburger || !overlay) return;
+
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('active');
+    overlay.classList.toggle('active');
+    document.body.style.overflow = overlay.classList.contains('active') ? 'hidden' : '';
+  });
+
+  // Close menu when a link is clicked
+  overlay.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      hamburger.classList.remove('active');
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    });
+  });
+})();
