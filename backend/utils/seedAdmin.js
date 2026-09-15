@@ -18,7 +18,7 @@ const seedAdmin = async () => {
   let mongoServer = null;
 
   try {
-    let uri = process.env.MONGO_URI;
+    let uri = process.env.MONGO_URI || process.env.MONGODB_URI;
 
     // Try connecting, fall back to in-memory if needed
     try {

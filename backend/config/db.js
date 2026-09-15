@@ -12,7 +12,7 @@ let mongoServer = null;
 
 const connectDB = async () => {
   try {
-    let uri = process.env.MONGO_URI;
+    let uri = process.env.MONGO_URI || process.env.MONGODB_URI;
 
     // Try connecting to the configured URI first
     // Use 30s timeout to allow Atlas DNS SRV resolution and TLS handshake
