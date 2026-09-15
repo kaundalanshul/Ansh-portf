@@ -5,7 +5,8 @@
  * Shared between login page and dashboard.
  */
 
-const API_BASE = 'http://localhost:5000/api';
+// API URL — change to your deployed Render backend URL when deploying admin (e.g. 'https://ansh-backend.onrender.com/api')
+const API_BASE = window.API_BASE || 'http://localhost:5000/api';
 const TOKEN_KEY = 'portfolio_admin_token';
 const ADMIN_KEY = 'portfolio_admin_data';
 
