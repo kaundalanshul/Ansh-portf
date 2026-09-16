@@ -45,8 +45,7 @@ const validateLogin = [
 const validateProject = [
   body('title')
     .trim()
-    .notEmpty()
-    .withMessage('Title is required')
+    .customSanitizer((val) => (!val || val === '') ? 'Untitled Project' : val)
     .isLength({ max: 100 })
     .withMessage('Title cannot exceed 100 characters'),
   body('description')

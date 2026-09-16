@@ -11,8 +11,8 @@ const projectSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: [true, 'Project title is required'],
       trim: true,
+      default: 'Untitled Project',
       maxlength: [100, 'Title cannot exceed 100 characters'],
     },
     description: {

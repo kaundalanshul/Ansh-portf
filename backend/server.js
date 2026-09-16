@@ -105,6 +105,11 @@ const startServer = async () => {
       console.log(`🌱 Admin seeded: ${process.env.ADMIN_EMAIL}`);
     }
 
+    // Sync projects between MongoDB and persistent disk storage
+    const Project = require('./models/Project');
+    const { initProjectSync } = require('./utils/projectStorage');
+    await initProjectSync(Project);
+
     // Start listening
     const server = app.listen(PORT, () => {
       console.log(`\n🚀 Backend API running on http://localhost:${PORT}`);

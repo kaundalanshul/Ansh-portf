@@ -61,6 +61,21 @@ function initThreeJS() {
 }
 
 async function loadProjects() {
+  const CACHE_KEY = 'portfolio_cached_projects';
+
+  // Show cached projects immediately while fetching
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      const cachedData = JSON.parse(cached);
+      if (Array.isArray(cachedData) && cachedData.length > 0) {
+        renderProjects(cachedData);
+        const statProj = document.getElementById('statProjects');
+        if (statProj) statProj.textContent = `${cachedData.length}+`;
+      }
+    }
+  } catch (e) { /* ignore cache errors */ }
+
   try {
     const res = await fetch(`${API_BASE}/projects`);
     const result = await res.json();
@@ -69,6 +84,10 @@ async function loadProjects() {
       renderProjects(result.data);
       const statProj = document.getElementById('statProjects');
       if (statProj) statProj.textContent = `${result.data.length}+`;
+      // Update cache
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify(result.data));
+      } catch (e) { /* ignore */ }
     }
   } catch (e) {
     console.error('Error loading projects', e);

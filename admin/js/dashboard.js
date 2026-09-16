@@ -183,12 +183,41 @@ function confirmDelete(text, callback) {
    PROJECTS CRUD
    ══════════════════════════════════════════════════ */
 
-/** Load and render projects */
+/** Load and render projects with localStorage caching for resilience */
 async function loadProjects() {
+  // Show cached projects immediately while fetching fresh data
+  const CACHE_KEY = 'portfolio_admin_projects_cache';
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      const cachedProjects = JSON.parse(cached);
+      if (Array.isArray(cachedProjects) && cachedProjects.length > 0 && projects.length === 0) {
+        projects = cachedProjects;
+        renderProjectsTable();
+      }
+    }
+  } catch (e) { /* ignore cache errors */ }
+
+  // Fetch fresh data from server
   const result = await authFetch('/projects');
   if (result && result.data) {
     projects = result.data;
     renderProjectsTable();
+    // Update cache
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify(result.data));
+    } catch (e) { /* ignore cache write errors */ }
+  } else if (projects.length === 0) {
+    // If fetch failed and no cache, try public endpoint without auth
+    try {
+      const res = await fetch(`${API_BASE}/projects`);
+      const data = await res.json();
+      if (data && data.data) {
+        projects = data.data;
+        renderProjectsTable();
+        localStorage.setItem(CACHE_KEY, JSON.stringify(data.data));
+      }
+    } catch (e) { /* server unavailable */ }
   }
 }
 
@@ -342,7 +371,7 @@ async function saveProject() {
   const techInput = document.getElementById('projectTechnologies').value;
 
   const data = {
-    title: document.getElementById('projectTitle').value.trim(),
+    title: document.getElementById('projectTitle').value.trim() || 'Untitled Project',
     description: document.getElementById('projectDescription').value.trim(),
     technologies: techInput ? techInput.split(',').map((t) => t.trim()).filter(Boolean) : [],
     imageUrl: document.getElementById('projectImageUrl').value.trim(),
@@ -351,12 +380,6 @@ async function saveProject() {
     featured: document.getElementById('projectFeatured').checked,
     order: parseInt(document.getElementById('projectOrder').value) || 0,
   };
-
-  // Only title is strictly required; allow saving partial/incomplete projects
-  if (!data.title) {
-    showToast('Project title is required', 'error');
-    return;
-  }
 
   let result;
   if (id) {
@@ -374,13 +397,13 @@ async function saveProject() {
   }
 
   if (result && result.success) {
-    showToast(result.message || 'Project saved!');
+    showToast(result.message || 'Project saved successfully!');
     closeModal('projectModal');
     await loadProjects();
     updateStats();
   } else {
     const errorDetail = result?.errors?.map((e) => e.message).join(', ');
-    const msg = errorDetail || result?.message || 'Failed to save project';
+    const msg = errorDetail || result?.message || 'Failed to save project. Please check your connection and try again.';
     showToast(msg, 'error');
   }
 }
