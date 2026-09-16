@@ -1,5 +1,6 @@
 [
   {
+    "_id": "6aaac03bc5afd93418f33490",
     "title": "GroceryStore - Full-Stack E-Commerce Platform",
     "description": "A responsive full-stack grocery shopping platform built with React, Node.js, Express, and MongoDB. Key features include product categorization, real-time cart updates, secure order processing, live order tracking, customer support chatbot, and an integrated admin control panel for managing products and inventory.",
     "technologies": [
@@ -16,7 +17,6 @@
     "githubUrl": "https://github.com/kaundalanshul/grocery.store",
     "featured": true,
     "order": 0,
-    "_id": "6aaac03bc5afd93418f33490",
     "createdAt": "2026-09-16T16:13:47.457Z",
     "updatedAt": "2026-09-16T16:13:47.457Z",
     "__v": 0

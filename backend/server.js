@@ -32,18 +32,27 @@ const app = express();
 /* ── Middleware ─────────────────────────────────── */
 
 // CORS — allow requests from local development and deployed domains
+const defaultOrigins = [
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  'http://localhost:3001',
+  'http://127.0.0.1:3001',
+  'https://ansh-portf-1.onrender.com',
+  'https://ansh-portf-2.onrender.com',
+];
+
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim())
-  : null;
+  : defaultOrigins;
 
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (e.g. mobile apps, curl, Postman)
     if (!origin) return callback(null, true);
-    if (!allowedOrigins || allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+    if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-    return callback(null, true);
+    return callback(new Error(`Origin ${origin} not allowed by CORS`));
   },
   credentials: true,
 }));
