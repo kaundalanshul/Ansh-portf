@@ -4,11 +4,16 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Dynamic config endpoint — injects API_BASE from environment variable
-// On Render: set API_URL=https://ansh-portf-2cf4.onrender.com/api
+// Dynamic config endpoint — injects API_BASE
+// On Render: auto-detects Render or uses API_URL env var -> https://ansh-portf-2cf4.onrender.com/api
 // Locally: defaults to http://localhost:5000/api
 app.get('/config.js', (req, res) => {
-  const apiUrl = process.env.API_URL || 'http://localhost:5000/api';
+  const host = req.get('host') || '';
+  const isRender = process.env.RENDER === 'true' || host.includes('onrender.com');
+  const defaultApi = isRender
+    ? 'https://ansh-portf-2cf4.onrender.com/api'
+    : 'http://localhost:5000/api';
+  const apiUrl = process.env.API_URL || defaultApi;
   res.type('application/javascript');
   res.send(`window.API_BASE = "${apiUrl}";`);
 });

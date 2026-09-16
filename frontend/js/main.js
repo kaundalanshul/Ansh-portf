@@ -1,5 +1,14 @@
-// API URL — change to your deployed Render backend URL when deploying frontend (e.g. 'https://ansh-backend.onrender.com/api')
-const API_BASE = window.API_BASE || 'http://localhost:5000/api';
+// API URL — dynamically resolved from config.js or auto-detected based on hostname
+function getApiBase() {
+  if (window.API_BASE && !window.API_BASE.includes('localhost')) {
+    return window.API_BASE;
+  }
+  if (window.location && window.location.hostname && window.location.hostname.includes('onrender.com')) {
+    return 'https://ansh-portf-2cf4.onrender.com/api';
+  }
+  return window.API_BASE || 'http://localhost:5000/api';
+}
+const API_BASE = getApiBase();
 
 document.addEventListener('DOMContentLoaded', () => {
   initThreeJS();
