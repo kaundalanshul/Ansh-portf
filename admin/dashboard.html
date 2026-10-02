@@ -43,6 +43,14 @@
           <span class="icon">🎯</span>
           <span>Skills</span>
         </div>
+        <div class="nav-item" data-section="interests" onclick="switchSection('interests')">
+          <span class="icon">💡</span>
+          <span>Interests</span>
+        </div>
+        <div class="nav-item" data-section="spotify" onclick="switchSection('spotify')">
+          <span class="icon">🎵</span>
+          <span>Music / Spotify</span>
+        </div>
         <div class="nav-item" data-section="messages" onclick="switchSection('messages')">
           <span class="icon">💬</span>
           <span>Messages</span>
@@ -305,6 +313,43 @@
         </form>
       </div>
 
+      <!-- ══════════════════════════════════════════
+           Interests Section
+           ══════════════════════════════════════════ -->
+      <div class="content-section" id="section-interests">
+        <div class="section-toolbar">
+          <h2>Manage Interests</h2>
+          <button class="btn btn-primary" onclick="openInterestCategoryModal()">
+            + Add Interest Category
+          </button>
+        </div>
+
+        <div id="interestCategoriesList">
+          <!-- Dynamically rendered interest category cards with their items -->
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           Music / Spotify Management Section
+           ══════════════════════════════════════════ -->
+      <div class="content-section" id="section-spotify">
+        <div class="section-toolbar">
+          <div>
+            <h2>Music / Spotify Management</h2>
+            <p style="color:var(--text-muted); font-size:0.85rem; margin-top:4px;">
+              Manage Spotify playlists linked to your Music interest. Add new playlists, edit links, or remove old ones.
+            </p>
+          </div>
+          <button class="btn btn-primary" onclick="openSpotifyModal()">
+            + Add Spotify Playlist
+          </button>
+        </div>
+
+        <div id="spotifyPlaylistsList">
+          <!-- Dynamically rendered Spotify playlists -->
+        </div>
+      </div>
+
     </main>
   </div>
 
@@ -512,6 +557,176 @@
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="closeModal('profileModal')">Cancel</button>
         <button class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       Interest Category Modal
+       ══════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="interestCategoryModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="interestCategoryModalTitle">Add Interest Category</h3>
+        <button class="modal-close" onclick="closeModal('interestCategoryModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="interestCategoryForm" onsubmit="event.preventDefault(); saveInterestCategory();">
+          <input type="hidden" id="interestCategoryId">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="interestCategoryTitle">Title *</label>
+              <input type="text" id="interestCategoryTitle" placeholder="MUSIC" style="text-transform: uppercase;">
+            </div>
+            <div class="form-group">
+              <label for="interestCategoryNum">Number</label>
+              <input type="text" id="interestCategoryNum" placeholder="01" style="width:80px;">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="interestCategoryImage">Image (Filename or URL)</label>
+            <input type="text" id="interestCategoryImage" placeholder="hobby_music.jpg or https://...">
+            <div id="interestCategoryImagePreview" style="display:none; margin-top:10px; text-align:center;">
+              <img id="interestCategoryPreviewImg" src="" alt="Preview" style="max-height:120px; border-radius:8px; border:1px solid var(--border-color);">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="interestCategoryUpload">📷 Or Upload Image Directly</label>
+            <input type="file" id="interestCategoryUpload" accept="image/*" onchange="handleInterestCategoryImageUpload(event)">
+          </div>
+
+          <div class="form-group">
+            <label for="interestCategoryDescription">Description (optional)</label>
+            <textarea id="interestCategoryDescription" rows="3" placeholder="A brief description of this interest area..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="interestCategoryOrder">Order</label>
+            <input type="number" id="interestCategoryOrder" placeholder="0" min="0" value="0">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('interestCategoryModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveInterestCategory()">Save Interest</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       Interest Item Modal
+       ══════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="interestItemModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="interestItemModalTitle">Add Item</h3>
+        <button class="modal-close" onclick="closeModal('interestItemModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="interestItemForm" onsubmit="event.preventDefault(); saveInterestItem();">
+          <input type="hidden" id="interestItemCategoryId">
+          <input type="hidden" id="interestItemId">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="interestItemTitle">Title</label>
+              <input type="text" id="interestItemTitle" placeholder="Discovery">
+            </div>
+            <div class="form-group">
+              <label for="interestItemTag">Tag / Label</label>
+              <input type="text" id="interestItemTag" placeholder="Album, Book, Place...">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="interestItemSubtitle">Subtitle (optional)</label>
+            <input type="text" id="interestItemSubtitle" placeholder="Daft Punk • 2001">
+          </div>
+
+          <div class="form-group">
+            <label for="interestItemDescription">Description (optional)</label>
+            <textarea id="interestItemDescription" rows="3" placeholder="Brief description of this item..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="interestItemImage">Image (URL or filename, optional)</label>
+            <input type="text" id="interestItemImage" placeholder="https://images.unsplash.com/... or filename.jpg">
+          </div>
+
+          <div class="form-group">
+            <label for="interestItemUpload">📷 Or Upload Image Directly</label>
+            <input type="file" id="interestItemUpload" accept="image/*" onchange="handleInterestItemImageUpload(event)">
+          </div>
+
+          <div class="form-group">
+            <label for="interestItemLink">Link (URL, optional)</label>
+            <input type="text" id="interestItemLink" placeholder="https://open.spotify.com/...">
+          </div>
+
+          <div class="form-group">
+            <label for="interestItemOrder">Order</label>
+            <input type="number" id="interestItemOrder" placeholder="0" min="0" value="0">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('interestItemModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveInterestItem()">Save Item</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       Spotify Playlist Modal
+       ══════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="spotifyModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="spotifyModalTitle">Add Spotify Playlist</h3>
+        <button class="modal-close" onclick="closeModal('spotifyModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="spotifyForm" onsubmit="event.preventDefault(); saveSpotifyPlaylist();">
+          <input type="hidden" id="spotifyCategoryId">
+          <input type="hidden" id="spotifyPlaylistId">
+
+          <div class="form-group">
+            <label for="spotifyCategorySelect">Interest Category *</label>
+            <select id="spotifyCategorySelect" required>
+              <!-- Dynamically populated -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="spotifyPlaylistTitle">Playlist Name / Title *</label>
+            <input type="text" id="spotifyPlaylistTitle" placeholder="Curated Spotify Playlist" required>
+          </div>
+
+          <div class="form-group">
+            <label for="spotifyPlaylistUrl">Spotify Link or Embed URL *</label>
+            <input type="url" id="spotifyPlaylistUrl" placeholder="https://open.spotify.com/playlist/..." required oninput="previewSpotifyEmbedInModal()">
+            <small style="color:var(--text-muted); font-size:0.8rem; display:block; margin-top:4px;">
+              Paste any Spotify link (playlist, track, album, etc.). It will automatically render as an interactive playable embed on your portfolio.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="spotifyPlaylistOrder">Display Order</label>
+            <input type="number" id="spotifyPlaylistOrder" placeholder="0" min="0" value="0">
+          </div>
+
+          <div id="spotifyModalPreviewContainer" style="display:none; margin-top:16px;">
+            <label style="display:block; margin-bottom:6px; font-weight:600; font-size:0.85rem; color:var(--text-muted); text-transform:uppercase;">Player Live Preview</label>
+            <iframe id="spotifyModalPreviewIframe" src="" width="100%" height="152" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" style="border-radius:12px; border:1px solid var(--border-color);"></iframe>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('spotifyModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveSpotifyPlaylist()">Save Playlist</button>
       </div>
     </div>
   </div>

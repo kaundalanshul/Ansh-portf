@@ -25,6 +25,7 @@ const projectRoutes = require('./routes/projectRoutes');
 const skillRoutes = require('./routes/skillRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const profileRoutes = require('./routes/profileRoutes');
+const interestRoutes = require('./routes/interestRoutes');
 
 // Initialize Express app
 const app = express();
@@ -76,6 +77,7 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/skills', skillRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/interests', interestRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -124,6 +126,11 @@ const startServer = async () => {
     const Project = require('./models/Project');
     const { initProjectSync } = require('./utils/projectStorage');
     await initProjectSync(Project);
+
+    // Sync interests between MongoDB and persistent disk storage
+    const Interest = require('./models/Interest');
+    const { initInterestSync } = require('./utils/interestStorage');
+    await initInterestSync(Interest);
 
     // Start listening
     const server = app.listen(PORT, () => {

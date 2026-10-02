@@ -15,8 +15,10 @@ document.addEventListener('DOMContentLoaded', () => {
   loadProfileSettings();
   loadProjects();
   loadSkills();
+  loadInterests();
   initContactForm();
   initTextReveal();
+  initInterestNavigation();
 });
 
 function initThreeJS() {
@@ -431,36 +433,434 @@ async function loadProfileSettings() {
         `;
       }
 
-      // Hobbies / Interests
-      if (p.hobbies && Array.isArray(p.hobbies)) {
-        renderFrontendHobbies(p.hobbies);
-      }
     }
   } catch (e) {
     console.error('Error loading profile settings', e);
   }
 }
 
-function renderFrontendHobbies(hobbies) {
+/* ══════════════════════════════════════════════════
+   INTERESTS & RELATED ITEMS CONTROLLER
+   ══════════════════════════════════════════════════ */
+
+window.currentInterests = [];
+
+// Fallback initial interests in case API is still initializing
+const fallbackInterests = [
+  {
+    _id: "670100000000000000000001",
+    num: "01",
+    title: "MUSIC",
+    image: "hobby_music.jpg",
+    description: "Curated playlists, sonic atmospheres, and electronic beats that provide the rhythm for deep coding sessions.",
+    items: [
+      {
+        _id: "670100000000000000000101",
+        title: "Discovery",
+        subtitle: "Daft Punk • 2001",
+        tag: "Album",
+        description: "The gold standard of French House and electronic production. From 'One More Time' to 'Voyager', every synth line is iconic.",
+        image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=600&q=80",
+        link: "https://open.spotify.com/album/4m2880jivSbbyEGAKfITCa"
+      },
+      {
+        _id: "670100000000000000000102",
+        title: "Dive",
+        subtitle: "Tycho • 2011",
+        tag: "Ambient",
+        description: "Warm, textured analog synthesizers and nostalgic acoustic melodies that form the backbone of endless focused development hours.",
+        image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=600&q=80",
+        link: "https://open.spotify.com/album/43q4GZ9U1Yw6Jc0z0C4n3j"
+      },
+      {
+        _id: "670100000000000000000103",
+        title: "Deep Focus Lo-Fi Coding",
+        subtitle: "Curated Spotify Mix",
+        tag: "Playlist",
+        description: "Down-tempo beats, vinyl crackles, and gentle electric piano chords tuned specifically for bug hunting and clean system design.",
+        image: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&w=600&q=80",
+        link: "https://open.spotify.com"
+      },
+      {
+        _id: "670100000000000000000104",
+        title: "Divenire",
+        subtitle: "Ludovico Einaudi • 2006",
+        tag: "Modern Classical",
+        description: "Breathtaking minimalist piano paired with cinematic string orchestration for creative inspiration and mental clarity.",
+        image: "https://images.unsplash.com/photo-1520523839898-507127043814?auto=format&fit=crop&w=600&q=80",
+        link: "https://open.spotify.com"
+      }
+    ],
+    spotifyPlaylists: [
+      {
+        _id: "670100000000000000000199",
+        title: "Curated Spotify Playlist",
+        url: "https://open.spotify.com/playlist/6jZaEmElzm5jlVlarE8jZc?si=-8pXoqm5TBKUbmbC6wVOoQ&utm_source=copy-link&pi=HWqHUETPS6qvE",
+        order: 0
+      }
+    ]
+  },
+  {
+    _id: "670100000000000000000002",
+    num: "02",
+    title: "TRAVEL",
+    image: "hobby_travel.jpg",
+    description: "Venture beyond screens into mountain ridges, serene coastal roads, and historic cultural destinations.",
+    items: [
+      {
+        _id: "670100000000000000000201",
+        title: "Himalayan Ridge Expeditions",
+        subtitle: "Himachal Pradesh & Spiti Valley",
+        tag: "Mountains",
+        description: "High altitude passes, rugged mountain terrains, ancient monasteries, and crystal-clear star-studded night skies.",
+        image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80",
+        link: ""
+      },
+      {
+        _id: "670100000000000000000202",
+        title: "Kyoto Heritage & Zen Gardens",
+        subtitle: "Kyoto, Japan",
+        tag: "Culture",
+        description: "Wandering through bamboo groves of Arashiyama, peaceful stone zen gardens, and historic cedar wooden temple architecture.",
+        image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=600&q=80",
+        link: ""
+      },
+      {
+        _id: "670100000000000000000203",
+        title: "Coastal Cliff Roads",
+        subtitle: "Ocean Highway Drives",
+        tag: "Road Trip",
+        description: "The thrill of open-window sunset drives along winding cliffs with the crash of ocean surf and crisp sea breezes.",
+        image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
+        link: ""
+      },
+      {
+        _id: "670100000000000000000204",
+        title: "Night Markets & Street Food",
+        subtitle: "Southeast Asia Trails",
+        tag: "Gastronomy",
+        description: "Immersing in sizzling culinary traditions, aromatic spices, lively night buzz, and spontaneous conversations with locals.",
+        image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
+        link: ""
+      }
+    ]
+  },
+  {
+    _id: "670100000000000000000003",
+    num: "03",
+    title: "READING",
+    image: "hobby_reading.jpg",
+    description: "Deep exploration of computer architecture, software craftsmanship, human psychology, and philosophical insights.",
+    items: [
+      {
+        _id: "670100000000000000000301",
+        title: "Designing Data-Intensive Applications",
+        subtitle: "Martin Kleppmann",
+        tag: "Architecture",
+        description: "The definitive guide to distributed databases, storage engines, stream processing, consensus, and fault-tolerant architectures.",
+        image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80",
+        link: "https://dataintensive.net/"
+      },
+      {
+        _id: "670100000000000000000302",
+        title: "Clean Code",
+        subtitle: "Robert C. Martin ('Uncle Bob')",
+        tag: "Craftsmanship",
+        description: "Principles of writing software that is readable, maintainable, modular, and a genuine pleasure for fellow engineers to collaborate on.",
+        image: "https://images.unsplash.com/photo-1532012164546-f432f2e3777a?auto=format&fit=crop&w=600&q=80",
+        link: ""
+      },
+      {
+        _id: "670100000000000000000303",
+        title: "Atomic Habits",
+        subtitle: "James Clear",
+        tag: "Productivity",
+        description: "A framework of incremental 1% compound improvements. System over goals, identity-based habits, and effortless consistency.",
+        image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=600&q=80",
+        link: ""
+      },
+      {
+        _id: "670100000000000000000304",
+        title: "Deep Work",
+        subtitle: "Cal Newport",
+        tag: "Philosophy",
+        description: "Cultivating intense, undistracted cognitive focus in an era of notifications, fragmented attention, and superficial busywork.",
+        image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80",
+        link: ""
+      }
+    ]
+  }
+];
+
+window.currentInterests = fallbackInterests;
+
+/** Load Interests from backend REST API */
+async function loadInterests() {
+  try {
+    const res = await fetch(`${API_BASE}/interests`);
+    const result = await res.json();
+    if (result && result.success && Array.isArray(result.data) && result.data.length > 0) {
+      window.currentInterests = result.data;
+      renderFrontendInterests(window.currentInterests);
+    } else {
+      renderFrontendInterests(fallbackInterests);
+    }
+  } catch (err) {
+    console.warn('Could not load interests from API, using fallback data:', err);
+    renderFrontendInterests(fallbackInterests);
+  }
+
+  // Check if page loaded with a specific interest hash
+  checkInterestHash();
+}
+
+/** Render clickable interest category cards in the main section */
+function renderFrontendInterests(interests) {
   const container = document.getElementById('hobbiesGrid');
   if (!container) return;
 
-  if (hobbies.length === 0) {
-    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">No interests added.</p>';
+  if (!interests || interests.length === 0) {
+    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary);">No interests added.</p>';
     return;
   }
 
-  container.innerHTML = hobbies.map((h, i) => `
-    <div class="hobby-card">
-      <div class="hobby-image-wrapper">
-        <img src="${h.image || 'hobby_music.jpg'}" alt="${h.title}" class="hobby-image">
+  container.innerHTML = interests.map((item, i) => {
+    const num = item.num || (i < 9 ? `0${i + 1}` : `${i + 1}`);
+    const itemCount = Array.isArray(item.items) ? item.items.length : 0;
+    const countText = itemCount === 1 ? '1 ITEM' : `${itemCount} ITEMS`;
+    const imageSrc = item.image || 'hobby_music.jpg';
+
+    return `
+      <div class="hobby-card" onclick="openInterestDetail('${item._id || item.title}')" role="button" tabindex="0" aria-label="View ${escapeHtml(item.title)} details">
+        <div class="hobby-image-wrapper">
+          <img src="${imageSrc}" alt="${escapeHtml(item.title)}" class="hobby-image" loading="lazy">
+          <span class="hobby-hover-prompt">[ EXPLORE → ]</span>
+        </div>
+        <div class="hobby-info">
+          <div class="hobby-meta-left">
+            <span class="hobby-num">${num}</span>
+            <h3 class="hobby-title">${escapeHtml(item.title)}</h3>
+          </div>
+          <span class="hobby-count-badge">${countText}</span>
+        </div>
       </div>
-      <div class="hobby-info">
-        <span class="hobby-num">${h.num || '0' + (i + 1)}</span>
-        <h3 class="hobby-title">${h.title}</h3>
-      </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
+}
+
+/** Open dedicated detail view for a specific interest */
+window.openInterestDetail = function(idOrTitle) {
+  const interest = window.currentInterests.find((it) => 
+    String(it._id) === String(idOrTitle) || 
+    it.title.toLowerCase() === String(idOrTitle).toLowerCase()
+  );
+
+  if (!interest) {
+    console.warn('Interest not found:', idOrTitle);
+    return;
+  }
+
+  const overlay = document.getElementById('interestDetailOverlay');
+  if (!overlay) return;
+
+  const num = interest.num || '01';
+  const title = interest.title || 'INTEREST';
+  const desc = interest.description || 'Explore curated items, recommendations, and creative inspirations.';
+  const image = interest.image || 'hobby_music.jpg';
+  const items = Array.isArray(interest.items) ? interest.items : [];
+
+  // Populate hero banner
+  const tagEl = document.getElementById('interestHeroTag');
+  const titleEl = document.getElementById('interestHeroTitle');
+  const descEl = document.getElementById('interestHeroDesc');
+  const imgEl = document.getElementById('interestHeroImg');
+  const countEl = document.getElementById('interestStatCount');
+  const breadcrumbEl = document.getElementById('interestDetailBreadcrumb');
+
+  if (tagEl) tagEl.textContent = `// INTEREST CATEGORY ${num}`;
+  if (titleEl) titleEl.textContent = title;
+  if (descEl) descEl.textContent = desc;
+  if (imgEl) {
+    imgEl.src = image;
+    imgEl.alt = title;
+  }
+  if (countEl) countEl.textContent = `${items.length} ${items.length === 1 ? 'ITEM' : 'ITEMS'}`;
+  if (breadcrumbEl) breadcrumbEl.textContent = `INTEREST / ${num} — ${title}`;
+
+  // Populate Spotify Playlists if available
+  const spotifySection = document.getElementById('interestSpotifySection');
+  const spotifyGrid = document.getElementById('interestSpotifyGrid');
+  const playlists = Array.isArray(interest.spotifyPlaylists) ? interest.spotifyPlaylists : [];
+
+  if (spotifySection && spotifyGrid) {
+    if (playlists.length > 0) {
+      spotifySection.style.display = 'block';
+      spotifyGrid.innerHTML = playlists.map((pl) => {
+        const embedUrl = getSpotifyEmbedUrl(pl.url);
+        const plTitle = pl.title || 'Curated Spotify Playlist';
+        return `
+          <div class="spotify-embed-card">
+            <div class="spotify-embed-header">
+              <div class="spotify-embed-title-wrap">
+                <svg class="spotify-icon" viewBox="0 0 24 24" width="16" height="16">
+                  <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.503 17.306c-.218.358-.68.472-1.038.254-2.846-1.74-6.428-2.133-10.65-1.168-.41.094-.817-.16-.91-.568-.094-.41.16-.816.568-.91 4.625-1.055 8.583-.609 11.772 1.354.358.218.472.68.258 1.038zm1.468-3.264c-.274.444-.86.587-1.304.313-3.257-2.003-8.225-2.583-12.078-1.413-.497.151-1.025-.133-1.176-.63-.151-.497.133-1.025.63-1.176 4.397-1.335 9.873-.687 13.615 1.615.444.274.587.86.313 1.304zm.126-3.398C15.2 8.354 8.795 8.134 5.12 9.25c-.6.183-1.238-.163-1.421-.763-.183-.6.163-1.238.763-1.421 4.22-1.282 11.29-1.026 15.655 1.565.542.321.721 1.022.4 1.564-.322.542-1.023.722-1.42.012z"/>
+                </svg>
+                <h4 class="spotify-embed-title">${escapeHtml(plTitle)}</h4>
+              </div>
+              <a href="${pl.url}" target="_blank" rel="noopener noreferrer" class="spotify-open-link" title="Open playlist in Spotify app">
+                <span>Open in App</span> ↗
+              </a>
+            </div>
+            <div class="spotify-iframe-wrapper">
+              <iframe 
+                src="${embedUrl}" 
+                width="100%" 
+                height="352" 
+                frameborder="0" 
+                allowfullscreen="" 
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                loading="lazy">
+              </iframe>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } else {
+      spotifySection.style.display = 'none';
+      spotifyGrid.innerHTML = '';
+    }
+  }
+
+  // Populate related items grid
+  const itemsGrid = document.getElementById('interestItemsGrid');
+  if (itemsGrid) {
+    if (items.length === 0) {
+      itemsGrid.innerHTML = `
+        <div class="interest-empty-items">
+          <p>No curated items added for ${escapeHtml(title)} yet.</p>
+          <p style="font-size:0.85rem; color:var(--text-secondary); margin-top:8px;">Add items from the admin panel to show them here!</p>
+        </div>
+      `;
+    } else {
+      itemsGrid.innerHTML = items.map((item, idx) => {
+        const itemTag = item.tag ? `<span class="interest-item-tag-badge">${escapeHtml(item.tag)}</span>` : '';
+        const itemMedia = item.image
+          ? `<img src="${item.image}" alt="${escapeHtml(item.title || 'Item')}" class="interest-item-img" loading="lazy">`
+          : `<div class="interest-item-placeholder">#${idx + 1}</div>`;
+        const linkBtn = item.link
+          ? `<div class="interest-item-action">
+               <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="interest-item-link-btn">
+                 [ EXPLORE LINK ↗ ]
+               </a>
+             </div>`
+          : '';
+
+        return `
+          <div class="interest-item-card">
+            <div class="interest-item-media">
+              ${itemMedia}
+              ${itemTag}
+            </div>
+            <div class="interest-item-body">
+              <h4 class="interest-item-title">${escapeHtml(item.title || 'Untitled')}</h4>
+              ${item.subtitle ? `<p class="interest-item-subtitle">${escapeHtml(item.subtitle)}</p>` : ''}
+              ${item.description ? `<p class="interest-item-desc">${escapeHtml(item.description)}</p>` : ''}
+              ${linkBtn}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  // Activate overlay
+  overlay.classList.add('active');
+  overlay.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+
+  // Update hash
+  const slug = encodeURIComponent(title.toLowerCase().replace(/\s+/g, '-'));
+  history.replaceState(null, '', `#interest-${slug}`);
+
+  // Scroll overlay to top
+  overlay.scrollTop = 0;
+};
+
+/** Open by name (fallback helper for initial DOM cards) */
+window.openInterestDetailByName = function(name) {
+  window.openInterestDetail(name);
+};
+
+/** Close dedicated detail view and return to Interests section */
+window.closeInterestDetail = function() {
+  const overlay = document.getElementById('interestDetailOverlay');
+  if (!overlay) return;
+
+  overlay.classList.remove('active');
+  overlay.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+
+  // Return to interests section
+  history.replaceState(null, '', '#hobbies');
+  const hobbiesSection = document.getElementById('hobbies');
+  if (hobbiesSection) {
+    hobbiesSection.scrollIntoView({ behavior: 'smooth' });
+  }
+};
+
+/** Deep-linking & Keyboard setup */
+function initInterestNavigation() {
+  // Listen for Escape key
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const overlay = document.getElementById('interestDetailOverlay');
+      if (overlay && overlay.classList.contains('active')) {
+        closeInterestDetail();
+      }
+    }
+  });
+
+  // Listen for hash changes
+  window.addEventListener('hashchange', checkInterestHash);
+}
+
+function checkInterestHash() {
+  const hash = window.location.hash;
+  if (hash && hash.startsWith('#interest-')) {
+    const slug = decodeURIComponent(hash.replace('#interest-', '')).replace(/-/g, ' ');
+    const matched = window.currentInterests.find((it) => it.title.toLowerCase() === slug.toLowerCase());
+    if (matched) {
+      openInterestDetail(matched._id);
+    }
+  }
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+/** Convert any Spotify URL into an official embed URL */
+function getSpotifyEmbedUrl(url) {
+  if (!url) return '';
+  url = url.trim();
+  if (url.includes('open.spotify.com/embed/')) {
+    return url.includes('theme=0') ? url : (url + (url.includes('?') ? '&theme=0' : '?theme=0'));
+  }
+  const match = url.match(/open\.spotify\.com\/(playlist|track|album|artist|show|episode)\/([a-zA-Z0-9]+)/i);
+  if (match) {
+    return `https://open.spotify.com/embed/${match[1]}/${match[2]}?utm_source=generator&theme=0`;
+  }
+  const uriMatch = url.match(/spotify:(playlist|track|album|artist|show|episode):([a-zA-Z0-9]+)/i);
+  if (uriMatch) {
+    return `https://open.spotify.com/embed/${uriMatch[1]}/${uriMatch[2]}?utm_source=generator&theme=0`;
+  }
+  return url;
 }
 
 /* ── Live Preview Device and Mode Switchers ─────── */

@@ -69,6 +69,14 @@ Admin panel at `http://localhost:3001`
 | GET | `/api/messages` | List messages | Yes |
 | PATCH | `/api/messages/:id/read` | Toggle read status | Yes |
 | DELETE | `/api/messages/:id` | Delete message | Yes |
+| GET | `/api/interests` | List interest categories with items | No |
+| GET | `/api/interests/:id` | Get single interest category | No |
+| POST | `/api/interests` | Create interest category | Yes |
+| PUT | `/api/interests/:id` | Update interest category | Yes |
+| DELETE | `/api/interests/:id` | Delete interest category | Yes |
+| POST | `/api/interests/:id/items` | Add item to category | Yes |
+| PUT | `/api/interests/:id/items/:itemId` | Update item | Yes |
+| DELETE | `/api/interests/:id/items/:itemId` | Delete item | Yes |
 | GET | `/api/health` | Health check | No |
 
 ---

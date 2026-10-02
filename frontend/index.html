@@ -90,41 +90,122 @@
     </div>
   </section>
 
-  <!-- Hobbies / Interests Section (New!) -->
+  <!-- Hobbies / Interests Section -->
   <section class="hobbies" id="hobbies">
     <div class="container">
       <h2 class="section-title text-center">INTERESTS</h2>
       <div class="hobbies-grid" id="hobbiesGrid">
-        <div class="hobby-card">
+        <div class="hobby-card" onclick="openInterestDetailByName('MUSIC')">
           <div class="hobby-image-wrapper">
             <img src="hobby_music.jpg" alt="Music" class="hobby-image">
+            <span class="hobby-hover-prompt">[ EXPLORE → ]</span>
           </div>
           <div class="hobby-info">
-            <span class="hobby-num">01</span>
-            <h3 class="hobby-title">MUSIC</h3>
+            <div class="hobby-meta-left">
+              <span class="hobby-num">01</span>
+              <h3 class="hobby-title">MUSIC</h3>
+            </div>
+            <span class="hobby-count-badge">ITEMS</span>
           </div>
         </div>
-        <div class="hobby-card">
+        <div class="hobby-card" onclick="openInterestDetailByName('TRAVEL')">
           <div class="hobby-image-wrapper">
             <img src="hobby_travel.jpg" alt="Travel" class="hobby-image">
+            <span class="hobby-hover-prompt">[ EXPLORE → ]</span>
           </div>
           <div class="hobby-info">
-            <span class="hobby-num">02</span>
-            <h3 class="hobby-title">TRAVEL</h3>
+            <div class="hobby-meta-left">
+              <span class="hobby-num">02</span>
+              <h3 class="hobby-title">TRAVEL</h3>
+            </div>
+            <span class="hobby-count-badge">ITEMS</span>
           </div>
         </div>
-        <div class="hobby-card">
+        <div class="hobby-card" onclick="openInterestDetailByName('READING')">
           <div class="hobby-image-wrapper">
             <img src="hobby_reading.jpg" alt="Reading" class="hobby-image">
+            <span class="hobby-hover-prompt">[ EXPLORE → ]</span>
           </div>
           <div class="hobby-info">
-            <span class="hobby-num">03</span>
-            <h3 class="hobby-title">READING</h3>
+            <div class="hobby-meta-left">
+              <span class="hobby-num">03</span>
+              <h3 class="hobby-title">READING</h3>
+            </div>
+            <span class="hobby-count-badge">ITEMS</span>
           </div>
         </div>
       </div>
     </div>
   </section>
+
+  <!-- Dedicated Interest Detail View Overlay -->
+  <div class="interest-detail-overlay" id="interestDetailOverlay" aria-hidden="true">
+    <div class="interest-detail-container">
+      <!-- Top Sticky Action Bar -->
+      <div class="interest-detail-topbar">
+        <button class="interest-back-btn" id="interestBackBtn" onclick="closeInterestDetail()">
+          <span>←</span> [ BACK TO INTERESTS ]
+        </button>
+        <span class="interest-detail-breadcrumb" id="interestDetailBreadcrumb">INTEREST / 01</span>
+      </div>
+
+      <!-- Main Category Hero Banner -->
+      <div class="interest-hero-banner">
+        <div class="interest-hero-content">
+          <div class="interest-hero-tag" id="interestHeroTag">// CATEGORY 01</div>
+          <h1 class="interest-hero-title" id="interestHeroTitle">MUSIC</h1>
+          <p class="interest-hero-desc" id="interestHeroDesc">
+            Soundtracks, playlists, and sonic atmospheres that power my development flow.
+          </p>
+          <div class="interest-hero-stats">
+            <span class="interest-stat-pill" id="interestStatCount">0 ITEMS</span>
+            <span class="interest-stat-pill">CURATED SELECTION</span>
+          </div>
+        </div>
+        <div class="interest-hero-media">
+          <div class="interest-hero-image-wrap">
+            <img id="interestHeroImg" src="hobby_music.jpg" alt="Interest Hero" class="interest-hero-img">
+          </div>
+        </div>
+      </div>
+
+      <!-- Official Spotify Playlist Embed Section -->
+      <div class="interest-spotify-section" id="interestSpotifySection" style="display: none;">
+        <div class="interest-spotify-header">
+          <div class="spotify-badge">
+            <svg class="spotify-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.503 17.306c-.218.358-.68.472-1.038.254-2.846-1.74-6.428-2.133-10.65-1.168-.41.094-.817-.16-.91-.568-.094-.41.16-.816.568-.91 4.625-1.055 8.583-.609 11.772 1.354.358.218.472.68.258 1.038zm1.468-3.264c-.274.444-.86.587-1.304.313-3.257-2.003-8.225-2.583-12.078-1.413-.497.151-1.025-.133-1.176-.63-.151-.497.133-1.025.63-1.176 4.397-1.335 9.873-.687 13.615 1.615.444.274.587.86.313 1.304zm.126-3.398C15.2 8.354 8.795 8.134 5.12 9.25c-.6.183-1.238-.163-1.421-.763-.183-.6.163-1.238.763-1.421 4.22-1.282 11.29-1.026 15.655 1.565.542.321.721 1.022.4 1.564-.322.542-1.023.722-1.42.012z"/>
+            </svg>
+            <span>SPOTIFY EMBED</span>
+          </div>
+          <h3 class="interest-spotify-heading">LIVE SPOTIFY PLAYLIST</h3>
+          <p class="interest-spotify-sub">Stream curated audio tracks directly on this page or launch in the Spotify app.</p>
+        </div>
+        <div class="interest-spotify-grid" id="interestSpotifyGrid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Related Items Section -->
+      <div class="interest-items-section">
+        <div class="interest-items-header">
+          <h3 class="interest-items-heading" id="interestItemsHeading">CURATED ITEMS & RECOMMENDATIONS</h3>
+          <span class="interest-items-rule" id="interestItemsRule">CLICK ANY LINK TO EXPLORE</span>
+        </div>
+
+        <div class="interest-items-grid" id="interestItemsGrid">
+          <!-- Dynamically populated related items cards -->
+        </div>
+      </div>
+
+      <!-- Bottom Return Bar -->
+      <div class="interest-bottom-bar">
+        <button class="interest-back-btn" onclick="closeInterestDetail()">
+          <span>←</span> [ BACK TO ALL INTERESTS ]
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Skills Section -->
   <section class="skills" id="skills">
