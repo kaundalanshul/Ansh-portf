@@ -10,12 +10,19 @@ function getApiBase() {
 }
 const API_BASE = getApiBase();
 
+// Configurable Resume Path — easily modified to point to any PDF file or URL
+const DEFAULT_RESUME_URL = 'resume.pdf';
+window.PORTFOLIO_CONFIG = Object.assign({
+  resumeUrl: DEFAULT_RESUME_URL
+}, window.PORTFOLIO_CONFIG || {});
+
 document.addEventListener('DOMContentLoaded', () => {
   initThreeJS();
   loadProfileSettings();
   loadProjects();
   loadSkills();
   loadInterests();
+  initPortfolioActions();
   initContactForm();
   initTextReveal();
   initInterestNavigation();
@@ -433,11 +440,99 @@ async function loadProfileSettings() {
         `;
       }
 
+      // Dynamic Resume Path (if configured in profile settings)
+      if (p.resumeUrl) {
+        window.PORTFOLIO_CONFIG.resumeUrl = p.resumeUrl;
+        updateResumeLinks();
+      }
+
     }
   } catch (e) {
     console.error('Error loading profile settings', e);
   }
 }
+
+/**
+ * Initialize Portfolio Action Buttons:
+ * 1. "Get in Touch" buttons: Smoothly scrolls to #contact
+ * 2. "Resume" buttons: Opens the interactive Resume Viewer modal
+ */
+function initPortfolioActions() {
+  updateResumeLinks();
+
+  // Smooth scroll for all contact action buttons
+  document.querySelectorAll('.js-contact-scroll, #aboutContactBtn, #skillsContactBtn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const contactSection = document.getElementById('contact');
+      if (contactSection) {
+        contactSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        history.pushState(null, '', '#contact');
+      }
+    });
+  });
+
+  // Open Resume Modal for all resume buttons
+  document.querySelectorAll('.js-open-resume, #aboutResumeBtn, #skillsResumeBtn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      openResumeModal();
+    });
+  });
+
+  // Close resume modal when Escape key is pressed
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeResumeModal();
+    }
+  });
+}
+
+/** Open the dedicated Resume Preview Modal */
+window.openResumeModal = function() {
+  const overlay = document.getElementById('resumeModalOverlay');
+  const iframe = document.getElementById('resumeModalIframe');
+  const resumeUrl = window.PORTFOLIO_CONFIG?.resumeUrl || DEFAULT_RESUME_URL;
+  if (!overlay) return;
+
+  if (iframe) {
+    if (!iframe.src || iframe.src === 'about:blank' || !iframe.src.includes(resumeUrl)) {
+      iframe.src = resumeUrl;
+    }
+  }
+
+  overlay.classList.add('active');
+  overlay.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+};
+
+/** Close the dedicated Resume Preview Modal */
+window.closeResumeModal = function() {
+  const overlay = document.getElementById('resumeModalOverlay');
+  if (!overlay) return;
+
+  overlay.classList.remove('active');
+  overlay.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+};
+
+/** Synchronize resume links across buttons and modal */
+function updateResumeLinks() {
+  const resumeUrl = window.PORTFOLIO_CONFIG?.resumeUrl || DEFAULT_RESUME_URL;
+
+  const downloadBtn = document.getElementById('modalResumeDownloadBtn');
+  if (downloadBtn) downloadBtn.href = resumeUrl;
+
+  const tabBtn = document.getElementById('modalResumeTabBtn');
+  if (tabBtn) tabBtn.href = resumeUrl;
+
+  const iframe = document.getElementById('resumeModalIframe');
+  const overlay = document.getElementById('resumeModalOverlay');
+  if (iframe && overlay && overlay.classList.contains('active')) {
+    iframe.src = resumeUrl;
+  }
+}
+
 
 /* ══════════════════════════════════════════════════
    INTERESTS & RELATED ITEMS CONTROLLER
@@ -649,9 +744,9 @@ function renderFrontendInterests(interests) {
 }
 
 /** Open dedicated detail view for a specific interest */
-window.openInterestDetail = function(idOrTitle) {
-  const interest = window.currentInterests.find((it) => 
-    String(it._id) === String(idOrTitle) || 
+window.openInterestDetail = function (idOrTitle) {
+  const interest = window.currentInterests.find((it) =>
+    String(it._id) === String(idOrTitle) ||
     it.title.toLowerCase() === String(idOrTitle).toLowerCase()
   );
 
@@ -787,12 +882,12 @@ window.openInterestDetail = function(idOrTitle) {
 };
 
 /** Open by name (fallback helper for initial DOM cards) */
-window.openInterestDetailByName = function(name) {
+window.openInterestDetailByName = function (name) {
   window.openInterestDetail(name);
 };
 
 /** Close dedicated detail view and return to Interests section */
-window.closeInterestDetail = function() {
+window.closeInterestDetail = function () {
   const overlay = document.getElementById('interestDetailOverlay');
   if (!overlay) return;
 
@@ -864,7 +959,7 @@ function getSpotifyEmbedUrl(url) {
 }
 
 /* ── Live Preview Device and Mode Switchers ─────── */
-window.setPreviewDevice = function(projId, device) {
+window.setPreviewDevice = function (projId, device) {
   const container = document.getElementById(`preview-${projId}`);
   if (!container) return;
 
@@ -885,7 +980,7 @@ window.setPreviewDevice = function(projId, device) {
   }
 };
 
-window.togglePreviewMode = function(projId, mode) {
+window.togglePreviewMode = function (projId, mode) {
   const container = document.getElementById(`preview-${projId}`);
   if (!container) return;
 

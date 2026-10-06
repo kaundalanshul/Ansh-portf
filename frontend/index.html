@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Anshul Kaundal — Full Stack & MERN Stack Developer. Portfolio.">
   <title>Anshul Kaundal | Full Stack & MERN Stack Developer</title>
-  
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
-  
+
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+
   <link rel="stylesheet" href="css/style.css">
-  
+
   <!-- Three.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
+
 <body>
 
   <!-- Top Navigation -->
@@ -58,9 +61,13 @@
         </div>
       </div>
       <div class="col text-content">
-        <p class="reveal-text serif-text" id="aboutBio">Hi, I'm Anshul Kaundal, a passionate MERN Stack Developer and Computer Science student who enjoys building modern, responsive, and user-friendly web applications.</p>
-        <p class="reveal-text" id="aboutSpecialization">I specialize in MongoDB, Express.js, React.js, and Node.js, with a strong interest in creating scalable full-stack solutions. I love turning ideas into functional digital experiences while continuously learning and exploring new technologies.</p>
-        <p class="reveal-text highlight-text" id="aboutHighlight">Building. Learning. Creating. One project at a time.</p>
+        <p class="reveal-text serif-text" id="aboutBio">Hi, I'm Anshul Kaundal, a passionate MERN Stack Developer and
+          Computer Science student who enjoys building modern, responsive, and user-friendly web applications.</p>
+        <p class="reveal-text" id="aboutSpecialization">I specialize in MongoDB, Express.js, React.js, and Node.js, with
+          a strong interest in creating scalable full-stack solutions. I love turning ideas into functional digital
+          experiences while continuously learning and exploring new technologies.</p>
+        <p class="reveal-text highlight-text" id="aboutHighlight">Building. Learning. Creating. One project at a time.
+        </p>
         <div class="stats-row">
           <div class="stat">
             <span class="stat-num" id="statProjects">0+</span>
@@ -70,6 +77,27 @@
             <span class="stat-num" id="statSkills">0+</span>
             <span class="stat-label">Skills</span>
           </div>
+        </div>
+
+        <!-- Action Buttons: Get in Touch & Resume -->
+        <div class="about-actions">
+          <a href="#contact" class="skills-btn skills-btn-contact js-contact-scroll" id="aboutContactBtn" aria-label="Get in touch via contact form">
+            <svg class="skills-btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+            <span>Get in Touch</span>
+          </a>
+          <button type="button" class="skills-btn skills-btn-resume js-open-resume" id="aboutResumeBtn" aria-label="View and download resume PDF">
+            <svg class="skills-btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span>Resume</span>
+          </button>
         </div>
       </div>
     </div>
@@ -174,12 +202,14 @@
         <div class="interest-spotify-header">
           <div class="spotify-badge">
             <svg class="spotify-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.503 17.306c-.218.358-.68.472-1.038.254-2.846-1.74-6.428-2.133-10.65-1.168-.41.094-.817-.16-.91-.568-.094-.41.16-.816.568-.91 4.625-1.055 8.583-.609 11.772 1.354.358.218.472.68.258 1.038zm1.468-3.264c-.274.444-.86.587-1.304.313-3.257-2.003-8.225-2.583-12.078-1.413-.497.151-1.025-.133-1.176-.63-.151-.497.133-1.025.63-1.176 4.397-1.335 9.873-.687 13.615 1.615.444.274.587.86.313 1.304zm.126-3.398C15.2 8.354 8.795 8.134 5.12 9.25c-.6.183-1.238-.163-1.421-.763-.183-.6.163-1.238.763-1.421 4.22-1.282 11.29-1.026 15.655 1.565.542.321.721 1.022.4 1.564-.322.542-1.023.722-1.42.012z"/>
+              <path
+                d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.503 17.306c-.218.358-.68.472-1.038.254-2.846-1.74-6.428-2.133-10.65-1.168-.41.094-.817-.16-.91-.568-.094-.41.16-.816.568-.91 4.625-1.055 8.583-.609 11.772 1.354.358.218.472.68.258 1.038zm1.468-3.264c-.274.444-.86.587-1.304.313-3.257-2.003-8.225-2.583-12.078-1.413-.497.151-1.025-.133-1.176-.63-.151-.497.133-1.025.63-1.176 4.397-1.335 9.873-.687 13.615 1.615.444.274.587.86.313 1.304zm.126-3.398C15.2 8.354 8.795 8.134 5.12 9.25c-.6.183-1.238-.163-1.421-.763-.183-.6.163-1.238.763-1.421 4.22-1.282 11.29-1.026 15.655 1.565.542.321.721 1.022.4 1.564-.322.542-1.023.722-1.42.012z" />
             </svg>
             <span>SPOTIFY EMBED</span>
           </div>
           <h3 class="interest-spotify-heading">LIVE SPOTIFY PLAYLIST</h3>
-          <p class="interest-spotify-sub">Stream curated audio tracks directly on this page or launch in the Spotify app.</p>
+          <p class="interest-spotify-sub">Stream curated audio tracks directly on this page or launch in the Spotify
+            app.</p>
         </div>
         <div class="interest-spotify-grid" id="interestSpotifyGrid">
           <!-- Populated by JS -->
@@ -213,6 +243,27 @@
       <h2 class="section-title text-center">EXPERTISE</h2>
       <div class="skills-grid" id="skillsGrid">
         <!-- Populated by JS -->
+      </div>
+
+      <!-- Skills Actions -->
+      <div class="skills-actions">
+        <a href="#contact" class="skills-btn skills-btn-contact js-contact-scroll" id="skillsContactBtn" aria-label="Get in touch via contact form">
+          <svg class="skills-btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+          <span>Get in Touch</span>
+        </a>
+        <button type="button" class="skills-btn skills-btn-resume js-open-resume" id="skillsResumeBtn" aria-label="View and download resume PDF">
+          <svg class="skills-btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          <span>Resume</span>
+        </button>
       </div>
     </div>
   </section>
@@ -251,7 +302,45 @@
     </div>
   </footer>
 
+  <!-- Resume Viewer Modal -->
+  <div class="resume-modal-overlay" id="resumeModalOverlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="resumeModalTitle">
+    <div class="resume-modal-backdrop" onclick="closeResumeModal()"></div>
+    <div class="resume-modal-container">
+      <div class="resume-modal-header">
+        <div class="resume-modal-title-group">
+          <span class="resume-modal-badge">DOCUMENT</span>
+          <h3 class="resume-modal-title" id="resumeModalTitle">ANSHUL KAUNDAL — RESUME</h3>
+        </div>
+        <div class="resume-modal-actions">
+          <a href="resume.pdf" class="resume-action-btn resume-action-download" id="modalResumeDownloadBtn" download="Anshul_Kaundal_Resume.pdf" title="Download Resume PDF">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Download</span>
+          </a>
+          <a href="resume.pdf" target="_blank" rel="noopener noreferrer" class="resume-action-btn resume-action-tab" id="modalResumeTabBtn" title="Open PDF in new tab">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+            <span>New Tab</span>
+          </a>
+          <button type="button" class="resume-modal-close" onclick="closeResumeModal()" aria-label="Close resume preview">
+            ✕
+          </button>
+        </div>
+      </div>
+      <div class="resume-modal-body">
+        <iframe src="resume.pdf" class="resume-iframe" id="resumeModalIframe" title="Resume PDF Preview"></iframe>
+      </div>
+    </div>
+  </div>
+
   <script src="/config.js"></script>
   <script src="js/main.js"></script>
 </body>
+
 </html>
