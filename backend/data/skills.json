@@ -1,0 +1,92 @@
+[
+  {
+    "_id": "6acdef3557c18c2da0d785a2",
+    "name": "Node.js",
+    "category": "Backend",
+    "proficiency": 90,
+    "icon": "🟢",
+    "order": 6,
+    "createdAt": "2026-10-13T08:43:33.973Z",
+    "updatedAt": "2026-10-13T08:43:33.973Z"
+  },
+  {
+    "_id": "6acdef3657c18c2da0d785a4",
+    "name": "Express.js",
+    "category": "Backend",
+    "proficiency": 90,
+    "icon": "🚂",
+    "order": 7,
+    "createdAt": "2026-10-13T08:43:34.235Z",
+    "updatedAt": "2026-10-13T08:43:34.235Z"
+  },
+  {
+    "_id": "6acdef3657c18c2da0d785a6",
+    "name": "RESTful APIs",
+    "category": "Backend",
+    "proficiency": 92,
+    "icon": "🔌",
+    "order": 8,
+    "createdAt": "2026-10-13T08:43:34.609Z",
+    "updatedAt": "2026-10-13T08:43:34.609Z"
+  },
+  {
+    "_id": "6acdef3657c18c2da0d785a8",
+    "name": "JWT Authentication",
+    "category": "Backend",
+    "proficiency": 85,
+    "icon": "🔐",
+    "order": 9,
+    "createdAt": "2026-10-13T08:43:34.751Z",
+    "updatedAt": "2026-10-13T08:43:34.751Z"
+  },
+  {
+    "_id": "6acdef3357c18c2da0d78598",
+    "name": "React.js",
+    "category": "Frontend",
+    "proficiency": 92,
+    "icon": "⚛️",
+    "order": 1,
+    "createdAt": "2026-10-13T08:43:31.262Z",
+    "updatedAt": "2026-10-13T08:43:31.262Z"
+  },
+  {
+    "_id": "6acdef3457c18c2da0d7859a",
+    "name": "JavaScript (ES6+)",
+    "category": "Frontend",
+    "proficiency": 95,
+    "icon": "⚡",
+    "order": 2,
+    "createdAt": "2026-10-13T08:43:32.247Z",
+    "updatedAt": "2026-10-13T08:43:32.247Z"
+  },
+  {
+    "_id": "6acdef3457c18c2da0d7859c",
+    "name": "HTML5 & CSS3",
+    "category": "Frontend",
+    "proficiency": 95,
+    "icon": "🎨",
+    "order": 3,
+    "createdAt": "2026-10-13T08:43:32.511Z",
+    "updatedAt": "2026-10-13T08:43:32.511Z"
+  },
+  {
+    "_id": "6acdef3457c18c2da0d7859e",
+    "name": "Tailwind CSS",
+    "category": "Frontend",
+    "proficiency": 88,
+    "icon": "💨",
+    "order": 4,
+    "createdAt": "2026-10-13T08:43:32.957Z",
+    "updatedAt": "2026-10-13T08:43:32.957Z"
+  },
+  {
+    "_id": "6acdef3557c18c2da0d785a0",
+    "name": "Three.js",
+    "category": "Frontend",
+    "proficiency": 80,
+    "icon": "🌐",
+    "order": 5,
+    "createdAt": "2026-10-13T08:43:33.304Z",
+    "updatedAt": "2026-10-13T08:43:33.304Z"
+  }
+]

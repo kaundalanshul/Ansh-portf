@@ -7,6 +7,7 @@
  */
 
 const Skill = require('../models/Skill');
+const { syncSkillToDisk, removeSkillFromDisk } = require('../utils/skillStorage');
 
 /**
  * GET /api/skills
@@ -33,6 +34,7 @@ const getSkills = async (req, res, next) => {
 const createSkill = async (req, res, next) => {
   try {
     const skill = await Skill.create(req.body);
+    syncSkillToDisk(skill);
 
     res.status(201).json({
       success: true,
@@ -63,6 +65,8 @@ const updateSkill = async (req, res, next) => {
       });
     }
 
+    syncSkillToDisk(skill);
+
     res.json({
       success: true,
       message: 'Skill updated successfully',
@@ -87,6 +91,8 @@ const deleteSkill = async (req, res, next) => {
         message: 'Skill not found',
       });
     }
+
+    removeSkillFromDisk(req.params.id);
 
     res.json({
       success: true,

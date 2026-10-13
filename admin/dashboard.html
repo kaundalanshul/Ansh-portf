@@ -35,6 +35,10 @@
           <span class="icon">📊</span>
           <span>Overview</span>
         </div>
+        <div class="nav-item" data-section="site-profile" onclick="switchSection('site-profile')">
+          <span class="icon">👤</span>
+          <span>Profile & Bio</span>
+        </div>
         <div class="nav-item" data-section="projects" onclick="switchSection('projects')">
           <span class="icon">🚀</span>
           <span>Projects</span>
@@ -42,6 +46,14 @@
         <div class="nav-item" data-section="skills" onclick="switchSection('skills')">
           <span class="icon">🎯</span>
           <span>Skills</span>
+        </div>
+        <div class="nav-item" data-section="journey" onclick="switchSection('journey')">
+          <span class="icon">🎓</span>
+          <span>Experience & Education</span>
+        </div>
+        <div class="nav-item" data-section="certifications" onclick="switchSection('certifications')">
+          <span class="icon">🏆</span>
+          <span>Certifications</span>
         </div>
         <div class="nav-item" data-section="interests" onclick="switchSection('interests')">
           <span class="icon">💡</span>
@@ -55,10 +67,6 @@
           <span class="icon">💬</span>
           <span>Messages</span>
           <span class="badge" id="unreadBadge" style="display:none;">0</span>
-        </div>
-        <div class="nav-item" data-section="site-profile" onclick="switchSection('site-profile')">
-          <span class="icon">⚙️</span>
-          <span>Site Content</span>
         </div>
       </nav>
 
@@ -101,6 +109,16 @@
           <div class="stat-icon">🎯</div>
           <div class="stat-number" id="totalSkills">0</div>
           <div class="stat-label">Total Skills</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">💼</div>
+          <div class="stat-number" id="totalExperience">0</div>
+          <div class="stat-label">Experience Roles</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📜</div>
+          <div class="stat-number" id="totalCertifications">0</div>
+          <div class="stat-label">Certifications</div>
         </div>
         <div class="stat-card">
           <div class="stat-icon">💬</div>
@@ -259,7 +277,14 @@
               </div>
               <div class="form-group">
                 <label for="siteProfileImage">Profile Photo (Filename or URL)</label>
-                <input type="text" id="siteProfileImage" placeholder="me_pfp.jpg">
+                <input type="text" id="siteProfileImage" placeholder="me_pfp.jpg" oninput="updateProfilePhotoPreview()">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="siteProfileUpload">📷 Upload Profile Photo Directly</label>
+              <input type="file" id="siteProfileUpload" accept="image/*" onchange="handleProfilePhotoUpload(event)">
+              <div id="siteProfilePreviewContainer" style="display:none; margin-top:10px; text-align:center;">
+                <img id="siteProfilePreviewImg" src="" alt="Profile Preview" style="max-height:120px; border-radius:8px; border:1px solid var(--border-color);">
               </div>
             </div>
             <div class="form-group">
@@ -279,9 +304,59 @@
 
           <div class="card"
             style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; padding:24px; margin-bottom:24px;">
+            <h3
+              style="margin-bottom:16px; color:var(--text-primary); border-bottom:1px solid var(--border-color); padding-bottom:8px;">
+              📬 Contact Details & Social Media Links</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="siteContactEmail">Contact Email</label>
+                <input type="email" id="siteContactEmail" placeholder="kaundalanshul725@gmail.com">
+              </div>
+              <div class="form-group">
+                <label for="siteContactPhone">Phone Number</label>
+                <input type="text" id="siteContactPhone" placeholder="+91 98765 43210">
+              </div>
+              <div class="form-group">
+                <label for="siteContactLocation">Location / Country</label>
+                <input type="text" id="siteContactLocation" placeholder="India">
+              </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border-color); padding-top:16px; margin-top:16px; margin-bottom:12px;">
+              <h4 style="color:var(--text-primary); margin:0;">🔗 Social Media Links</h4>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="addSocialLinkRow()">+ Add Social Link</button>
+            </div>
+            <div id="socialLinksAdminContainer">
+              <!-- Dynamic social link rows -->
+            </div>
+          </div>
+
+          <div class="card"
+            style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; padding:24px; margin-bottom:24px;">
+            <h3
+              style="margin-bottom:16px; color:var(--text-primary); border-bottom:1px solid var(--border-color); padding-bottom:8px;">
+              📄 Resume Settings</h3>
+            <div class="form-group">
+              <label for="siteResumeUrl">Resume PDF Path or URL</label>
+              <div style="display:flex; gap:8px;">
+                <input type="text" id="siteResumeUrl" placeholder="resume.pdf" style="flex:1;">
+                <button type="button" class="btn btn-secondary" onclick="testResumeLink()" style="white-space:nowrap;">🔗 Open Test</button>
+              </div>
+              <small style="color:var(--text-muted); font-size:0.8rem; display:block; margin-top:4px;">
+                Can be a local file path (e.g. <code>resume.pdf</code>) or any external hosted document URL (e.g. Google Drive, GitHub).
+              </small>
+            </div>
+            <div class="form-group">
+              <label for="siteResumeUpload">📷 Or Upload Resume PDF Directly</label>
+              <input type="file" id="siteResumeUpload" accept=".pdf" onchange="handleResumeUpload(event)">
+            </div>
+          </div>
+
+          <div class="card"
+            style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; padding:24px; margin-bottom:24px;">
             <div
               style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:8px; margin-bottom:16px;">
-              <h3 style="color:var(--text-primary); margin:0;">💡 Interests & Hobbies</h3>
+              <h3 style="color:var(--text-primary); margin:0;">💡 Interests Summary Quick List</h3>
               <button type="button" class="btn btn-secondary" onclick="addHobbyRow()">+ Add Interest</button>
             </div>
             <div id="hobbiesContainer">
@@ -293,11 +368,7 @@
             style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; padding:24px; margin-bottom:24px;">
             <h3
               style="margin-bottom:16px; color:var(--text-primary); border-bottom:1px solid var(--border-color); padding-bottom:8px;">
-              📬 Contact & Footer</h3>
-            <div class="form-group">
-              <label for="siteContactEmail">Contact Section Email</label>
-              <input type="email" id="siteContactEmail" placeholder="kaundalanshul725@gmail.com">
-            </div>
+              📢 Footer Marquee Banner</h3>
             <div class="form-group">
               <label for="siteMarqueeText">Footer Marquee Text</label>
               <input type="text" id="siteMarqueeText"
@@ -311,6 +382,135 @@
             </button>
           </div>
         </form>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           Experience & Education Section
+           ══════════════════════════════════════════ -->
+      <div class="content-section" id="section-journey">
+        <div class="section-toolbar">
+          <div>
+            <h2>Manage Experience & Education</h2>
+            <p style="color:var(--text-muted); font-size:0.85rem; margin-top:4px;">
+              Manage your professional work history, internships, and formal degrees.
+            </p>
+          </div>
+        </div>
+
+        <!-- Work Experience Card -->
+        <div class="card" style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; padding:24px; margin-bottom:28px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h3 style="margin:0; color:var(--text-primary);">💼 Work Experience</h3>
+            <button class="btn btn-primary" onclick="openExperienceModal()">+ Add Experience</button>
+          </div>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Role</th>
+                  <th>Company</th>
+                  <th>Period</th>
+                  <th>Location</th>
+                  <th>Technologies</th>
+                  <th>Order</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="experienceTableBody">
+                <!-- Dynamic rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Formal Education Card -->
+        <div class="card" style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; padding:24px; margin-bottom:28px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h3 style="margin:0; color:var(--text-primary);">🎓 Formal Education</h3>
+            <button class="btn btn-primary" onclick="openEducationModal()">+ Add Education</button>
+          </div>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Degree / Program</th>
+                  <th>Institution</th>
+                  <th>Year</th>
+                  <th>Grade</th>
+                  <th>Order</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="educationTableBody">
+                <!-- Dynamic rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           Certifications & Achievements Section
+           ══════════════════════════════════════════ -->
+      <div class="content-section" id="section-certifications">
+        <div class="section-toolbar">
+          <div>
+            <h2>Manage Certifications & Achievements</h2>
+            <p style="color:var(--text-muted); font-size:0.85rem; margin-top:4px;">
+              Showcase verified course credentials, honors, and notable achievements.
+            </p>
+          </div>
+        </div>
+
+        <!-- Certifications Card -->
+        <div class="card" style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; padding:24px; margin-bottom:28px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h3 style="margin:0; color:var(--text-primary);">🏆 Certifications</h3>
+            <button class="btn btn-primary" onclick="openCertificationModal()">+ Add Certification</button>
+          </div>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Issuer</th>
+                  <th>Date</th>
+                  <th>Credential ID</th>
+                  <th>Link</th>
+                  <th>Order</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="certificationsTableBody">
+                <!-- Dynamic rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Achievements Card -->
+        <div class="card" style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; padding:24px; margin-bottom:28px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h3 style="margin:0; color:var(--text-primary);">⚡ Key Achievements</h3>
+            <button class="btn btn-primary" onclick="openAchievementModal()">+ Add Achievement</button>
+          </div>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Description</th>
+                  <th>Date</th>
+                  <th>Order</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="achievementsTableBody">
+                <!-- Dynamic rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
       <!-- ══════════════════════════════════════════
@@ -727,6 +927,213 @@
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="closeModal('spotifyModal')">Cancel</button>
         <button class="btn btn-primary" onclick="saveSpotifyPlaylist()">Save Playlist</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       Experience Modal
+       ══════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="experienceModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="experienceModalTitle">Add Work Experience</h3>
+        <button class="modal-close" onclick="closeModal('experienceModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="experienceForm" onsubmit="event.preventDefault(); saveExperience();">
+          <input type="hidden" id="expId">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="expRole">Role / Job Title *</label>
+              <input type="text" id="expRole" placeholder="Full Stack Developer" required>
+            </div>
+            <div class="form-group">
+              <label for="expCompany">Company / Organization *</label>
+              <input type="text" id="expCompany" placeholder="Freelance / Company Name" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="expPeriod">Period / Timeline</label>
+              <input type="text" id="expPeriod" placeholder="2024 — Present">
+            </div>
+            <div class="form-group">
+              <label for="expLocation">Location</label>
+              <input type="text" id="expLocation" placeholder="Remote / India">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="expDescription">Description of Responsibilities & Impact</label>
+            <textarea id="expDescription" rows="3" placeholder="Engineered responsive full-stack features, built REST APIs..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="expTechnologies">Technologies (comma separated)</label>
+              <input type="text" id="expTechnologies" placeholder="React, Node.js, Express, MongoDB">
+            </div>
+            <div class="form-group">
+              <label for="expOrder">Order</label>
+              <input type="number" id="expOrder" placeholder="0" min="0" value="0">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('experienceModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveExperience()">Save Experience</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       Education Modal
+       ══════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="educationModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="educationModalTitle">Add Education</h3>
+        <button class="modal-close" onclick="closeModal('educationModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="educationForm" onsubmit="event.preventDefault(); saveEducation();">
+          <input type="hidden" id="eduId">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="eduDegree">Degree / Major / Program *</label>
+              <input type="text" id="eduDegree" placeholder="B.Tech in Computer Science" required>
+            </div>
+            <div class="form-group">
+              <label for="eduInstitution">Institution / University *</label>
+              <input type="text" id="eduInstitution" placeholder="APG Shimla University" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="eduYear">Years / Timeline</label>
+              <input type="text" id="eduYear" placeholder="2022 — 2026">
+            </div>
+            <div class="form-group">
+              <label for="eduGrade">Grade / Honors</label>
+              <input type="text" id="eduGrade" placeholder="CGPA: 8.5/10">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="eduDescription">Key Coursework / Focus</label>
+            <textarea id="eduDescription" rows="3" placeholder="Data Structures, Algorithms, Full Stack Development..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="eduOrder">Order</label>
+            <input type="number" id="eduOrder" placeholder="0" min="0" value="0">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('educationModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveEducation()">Save Education</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       Certification Modal
+       ══════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="certificationModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="certificationModalTitle">Add Certification</h3>
+        <button class="modal-close" onclick="closeModal('certificationModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="certificationForm" onsubmit="event.preventDefault(); saveCertification();">
+          <input type="hidden" id="certId">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="certTitle">Certification Title *</label>
+              <input type="text" id="certTitle" placeholder="Full Stack Web Development with MERN" required>
+            </div>
+            <div class="form-group">
+              <label for="certIssuer">Issuing Organization *</label>
+              <input type="text" id="certIssuer" placeholder="Coursera / Udemy / freeCodeCamp" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="certIssueDate">Issue Date / Year</label>
+              <input type="text" id="certIssueDate" placeholder="2025">
+            </div>
+            <div class="form-group">
+              <label for="certCredentialId">Credential ID (Optional)</label>
+              <input type="text" id="certCredentialId" placeholder="CERT-MERN-2025">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="certCredentialUrl">Credential Verification Link / URL</label>
+            <input type="url" id="certCredentialUrl" placeholder="https://coursera.org/verify/...">
+          </div>
+
+          <div class="form-group">
+            <label for="certOrder">Order</label>
+            <input type="number" id="certOrder" placeholder="0" min="0" value="0">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('certificationModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveCertification()">Save Certification</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       Achievement Modal
+       ══════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="achievementModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="achievementModalTitle">Add Achievement</h3>
+        <button class="modal-close" onclick="closeModal('achievementModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="achievementForm" onsubmit="event.preventDefault(); saveAchievement();">
+          <input type="hidden" id="achieveId">
+
+          <div class="form-group">
+            <label for="achieveTitle">Achievement Title *</label>
+            <input type="text" id="achieveTitle" placeholder="Built & Deployed Full-Stack E-Commerce Platform" required>
+          </div>
+
+          <div class="form-group">
+            <label for="achieveDescription">Description / Details</label>
+            <textarea id="achieveDescription" rows="3" placeholder="Engineered high-performance cart, live status updates..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="achieveDate">Date / Year</label>
+              <input type="text" id="achieveDate" placeholder="2026">
+            </div>
+            <div class="form-group">
+              <label for="achieveOrder">Order</label>
+              <input type="number" id="achieveOrder" placeholder="0" min="0" value="0">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('achievementModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveAchievement()">Save Achievement</button>
       </div>
     </div>
   </div>

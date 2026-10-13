@@ -42,6 +42,40 @@ async function loadDashboardData() {
   updateStats();
 }
 
+/** Update overview stats counters */
+function updateStats() {
+  const projEl = document.getElementById('totalProjects');
+  if (projEl) projEl.textContent = projects.length;
+
+  const skillEl = document.getElementById('totalSkills');
+  if (skillEl) skillEl.textContent = skills.length;
+
+  const expEl = document.getElementById('totalExperience');
+  if (expEl) {
+    const count = currentSiteProfile && Array.isArray(currentSiteProfile.experience) ? currentSiteProfile.experience.length : 0;
+    expEl.textContent = count;
+  }
+
+  const certEl = document.getElementById('totalCertifications');
+  if (certEl) {
+    const count = currentSiteProfile && Array.isArray(currentSiteProfile.certifications) ? currentSiteProfile.certifications.length : 0;
+    certEl.textContent = count;
+  }
+
+  const msgEl = document.getElementById('totalMessages');
+  if (msgEl) msgEl.textContent = messages.length;
+
+  const unreadCount = messages.filter((m) => !m.read).length;
+  const unreadEl = document.getElementById('unreadMessages');
+  if (unreadEl) unreadEl.textContent = unreadCount;
+
+  const badgeEl = document.getElementById('unreadBadge');
+  if (badgeEl) {
+    badgeEl.textContent = unreadCount;
+    badgeEl.style.display = unreadCount > 0 ? 'inline-block' : 'none';
+  }
+}
+
 /* ══════════════════════════════════════════════════
    Sidebar Navigation
    ══════════════════════════════════════════════════ */
@@ -68,6 +102,8 @@ function switchSection(section) {
     overview: 'Overview',
     projects: 'Manage Projects',
     skills: 'Manage Skills',
+    journey: 'Experience & Education',
+    certifications: 'Certifications & Achievements',
     interests: 'Manage Interests',
     spotify: 'Music / Spotify Management',
     messages: 'Contact Messages',
@@ -76,7 +112,7 @@ function switchSection(section) {
   const titleEl = document.getElementById('pageTitle');
   if (titleEl) titleEl.textContent = titles[section] || 'Dashboard';
 
-  if (section === 'site-profile') {
+  if (section === 'site-profile' || section === 'journey' || section === 'certifications') {
     loadSiteProfileSettings();
   }
   if (section === 'interests') {
@@ -773,28 +809,174 @@ async function saveProfile() {
 
 let currentSiteProfile = null;
 
-/** Load site profile settings from API */
+/** Load site profile settings from API and populate all admin sections */
 async function loadSiteProfileSettings() {
   try {
     const res = await fetch(`${API_BASE}/profile`);
     const data = await res.json();
     if (data.success && data.data) {
       currentSiteProfile = data.data;
-      document.getElementById('siteHeroTitle').value = currentSiteProfile.heroTitle || '';
-      document.getElementById('siteHeroSubtitle').value = currentSiteProfile.heroSubtitle || '';
-      document.getElementById('siteName').value = currentSiteProfile.name || '';
-      document.getElementById('siteProfileImage').value = currentSiteProfile.profileImage || '';
-      document.getElementById('siteAboutBio').value = currentSiteProfile.aboutBio || '';
-      document.getElementById('siteAboutSpecialization').value = currentSiteProfile.aboutSpecialization || '';
-      document.getElementById('siteAboutHighlight').value = currentSiteProfile.aboutHighlight || '';
-      document.getElementById('siteContactEmail').value = currentSiteProfile.contactEmail || '';
-      document.getElementById('siteMarqueeText').value = currentSiteProfile.marqueeText || '';
 
+      // Hero
+      const heroTitleEl = document.getElementById('siteHeroTitle');
+      if (heroTitleEl) heroTitleEl.value = currentSiteProfile.heroTitle || '';
+      const heroSubEl = document.getElementById('siteHeroSubtitle');
+      if (heroSubEl) heroSubEl.value = currentSiteProfile.heroSubtitle || '';
+
+      // Profile & About
+      const nameEl = document.getElementById('siteName');
+      if (nameEl) nameEl.value = currentSiteProfile.name || '';
+      const pfpEl = document.getElementById('siteProfileImage');
+      if (pfpEl) {
+        pfpEl.value = currentSiteProfile.profileImage || '';
+        updateProfilePhotoPreview();
+      }
+      const bioEl = document.getElementById('siteAboutBio');
+      if (bioEl) bioEl.value = currentSiteProfile.aboutBio || '';
+      const specEl = document.getElementById('siteAboutSpecialization');
+      if (specEl) specEl.value = currentSiteProfile.aboutSpecialization || '';
+      const highlightEl = document.getElementById('siteAboutHighlight');
+      if (highlightEl) highlightEl.value = currentSiteProfile.aboutHighlight || '';
+
+      // Contact & Social
+      const emailEl = document.getElementById('siteContactEmail');
+      if (emailEl) emailEl.value = currentSiteProfile.contactEmail || '';
+      const phoneEl = document.getElementById('siteContactPhone');
+      if (phoneEl) phoneEl.value = currentSiteProfile.contactPhone || '';
+      const locEl = document.getElementById('siteContactLocation');
+      if (locEl) locEl.value = currentSiteProfile.contactLocation || '';
+
+      renderSocialLinksAdmin(currentSiteProfile.socialLinks || []);
+
+      // Resume
+      const resumeEl = document.getElementById('siteResumeUrl');
+      if (resumeEl) resumeEl.value = currentSiteProfile.resumeUrl || 'resume.pdf';
+
+      // Footer Marquee
+      const marqueeEl = document.getElementById('siteMarqueeText');
+      if (marqueeEl) marqueeEl.value = currentSiteProfile.marqueeText || '';
+
+      // Hobbies Quick List
       renderHobbies(currentSiteProfile.hobbies || []);
+
+      // Experience & Education Tables
+      renderExperienceAdmin(currentSiteProfile.experience || []);
+      renderEducationAdmin(currentSiteProfile.education || []);
+
+      // Certifications & Achievements Tables
+      renderCertificationsAdmin(currentSiteProfile.certifications || []);
+      renderAchievementsAdmin(currentSiteProfile.achievements || []);
+
+      updateStats();
     }
   } catch (err) {
     showToast('Failed to load site profile settings', 'error');
   }
+}
+
+/** Update profile photo live thumbnail */
+function updateProfilePhotoPreview() {
+  const input = document.getElementById('siteProfileImage');
+  const container = document.getElementById('siteProfilePreviewContainer');
+  const img = document.getElementById('siteProfilePreviewImg');
+  if (!input || !container || !img) return;
+
+  const val = input.value.trim();
+  if (val) {
+    img.src = val;
+    container.style.display = 'block';
+  } else {
+    container.style.display = 'none';
+  }
+}
+
+/** Handle direct profile image upload */
+function handleProfilePhotoUpload(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    const dataUrl = evt.target.result;
+    const input = document.getElementById('siteProfileImage');
+    if (input) input.value = dataUrl;
+    updateProfilePhotoPreview();
+    showToast('Profile photo loaded! Click "Save All Changes" to persist.');
+  };
+  reader.readAsDataURL(file);
+}
+
+/** Test current resume link */
+function testResumeLink() {
+  const url = document.getElementById('siteResumeUrl').value.trim() || 'resume.pdf';
+  window.open(url, '_blank');
+}
+
+/** Handle direct resume upload */
+function handleResumeUpload(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    const dataUrl = evt.target.result;
+    const input = document.getElementById('siteResumeUrl');
+    if (input) input.value = dataUrl;
+    showToast('Resume PDF loaded! Click "Save All Changes" to persist.');
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ── Social Media Links Admin ──────────────────── */
+
+function renderSocialLinksAdmin(links) {
+  const container = document.getElementById('socialLinksAdminContainer');
+  if (!container) return;
+  container.innerHTML = '';
+
+  if (!links || links.length === 0) {
+    container.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem;">No social media links added. Click "+ Add Social Link" to add your GitHub, LinkedIn, etc.</p>';
+    return;
+  }
+
+  links.forEach((s) => {
+    addSocialLinkRow(s.platform, s.label, s.url);
+  });
+}
+
+function addSocialLinkRow(platform = 'github', label = '', url = '') {
+  const container = document.getElementById('socialLinksAdminContainer');
+  if (!container) return;
+
+  if (container.querySelector('p')) {
+    container.innerHTML = '';
+  }
+
+  const row = document.createElement('div');
+  row.className = 'social-link-input-row';
+  row.style.cssText = 'display:flex; gap:10px; align-items:center; margin-bottom:10px; background:var(--bg-input); padding:10px; border-radius:8px;';
+
+  row.innerHTML = `
+    <select class="social-platform-select" style="width:130px;">
+      <option value="github" ${platform === 'github' ? 'selected' : ''}>GitHub</option>
+      <option value="linkedin" ${platform === 'linkedin' ? 'selected' : ''}>LinkedIn</option>
+      <option value="twitter" ${platform === 'twitter' ? 'selected' : ''}>Twitter / X</option>
+      <option value="email" ${platform === 'email' ? 'selected' : ''}>Email</option>
+      <option value="instagram" ${platform === 'instagram' ? 'selected' : ''}>Instagram</option>
+      <option value="portfolio" ${platform === 'portfolio' ? 'selected' : ''}>Website</option>
+      <option value="leetcode" ${platform === 'leetcode' ? 'selected' : ''}>LeetCode</option>
+    </select>
+    <input type="text" class="social-label-input" placeholder="Label (e.g. GitHub)" value="${label || ''}" style="width:140px;">
+    <input type="text" class="social-url-input" placeholder="URL (e.g. https://github.com/...)" value="${url || ''}" style="flex:1;">
+    <button type="button" class="btn btn-secondary btn-sm" onclick="removeSocialLinkRow(this)" style="color:var(--accent-red,#ef4444); border-color:var(--border-color);">✕</button>
+  `;
+
+  container.appendChild(row);
+}
+
+function removeSocialLinkRow(btn) {
+  const row = btn.closest('.social-link-input-row');
+  if (row) row.remove();
 }
 
 /** Render interest/hobby rows in the admin form */
@@ -818,7 +1000,6 @@ function addHobbyRow(title = '', image = '', num = '') {
   const container = document.getElementById('hobbiesContainer');
   if (!container) return;
 
-  // Clear empty message if present
   if (container.querySelector('p')) {
     container.innerHTML = '';
   }
@@ -837,7 +1018,6 @@ function addHobbyRow(title = '', image = '', num = '') {
   container.appendChild(row);
 }
 
-/** Remove a hobby row */
 function removeHobbyRow(btn) {
   const row = btn.closest('.hobby-input-row');
   if (row) row.remove();
@@ -853,11 +1033,26 @@ async function saveSiteProfileSettings() {
   const aboutSpecialization = document.getElementById('siteAboutSpecialization').value.trim();
   const aboutHighlight = document.getElementById('siteAboutHighlight').value.trim();
   const contactEmail = document.getElementById('siteContactEmail').value.trim();
+  const contactPhone = (document.getElementById('siteContactPhone')?.value || '').trim();
+  const contactLocation = (document.getElementById('siteContactLocation')?.value || '').trim();
+  const resumeUrl = (document.getElementById('siteResumeUrl')?.value || '').trim();
   const marqueeText = document.getElementById('siteMarqueeText').value.trim();
+
+  // Collect social links
+  const socialRows = document.querySelectorAll('.social-link-input-row');
+  const socialLinks = [];
+  socialRows.forEach((row, idx) => {
+    const platform = row.querySelector('.social-platform-select').value;
+    const label = row.querySelector('.social-label-input').value.trim();
+    const url = row.querySelector('.social-url-input').value.trim();
+    if (url) {
+      socialLinks.push({ platform, label: label || platform, url, order: idx + 1 });
+    }
+  });
 
   // Collect hobbies
   const hobbiesContainer = document.getElementById('hobbiesContainer');
-  const hobbyRows = hobbiesContainer.querySelectorAll('.hobby-input-row');
+  const hobbyRows = hobbiesContainer ? hobbiesContainer.querySelectorAll('.hobby-input-row') : [];
   const hobbies = [];
 
   hobbyRows.forEach((row, idx) => {
@@ -879,9 +1074,21 @@ async function saveSiteProfileSettings() {
     aboutSpecialization,
     aboutHighlight,
     contactEmail,
+    contactPhone,
+    contactLocation,
+    resumeUrl,
     marqueeText,
     hobbies,
+    socialLinks,
   };
+
+  // Preserve existing experience, education, certs, and achievements arrays
+  if (currentSiteProfile) {
+    if (currentSiteProfile.experience) payload.experience = currentSiteProfile.experience;
+    if (currentSiteProfile.education) payload.education = currentSiteProfile.education;
+    if (currentSiteProfile.certifications) payload.certifications = currentSiteProfile.certifications;
+    if (currentSiteProfile.achievements) payload.achievements = currentSiteProfile.achievements;
+  }
 
   const result = await authFetch('/profile', {
     method: 'PUT',
@@ -891,9 +1098,582 @@ async function saveSiteProfileSettings() {
   if (result && result.success) {
     showToast('Site content & profile updated successfully!', 'success');
     currentSiteProfile = result.data;
+    updateStats();
   } else {
     showToast(result?.message || 'Failed to update site content', 'error');
   }
+}
+
+/* ══════════════════════════════════════════════════
+   WORK EXPERIENCE CRUD
+   ══════════════════════════════════════════════════ */
+
+function renderExperienceAdmin(list) {
+  const tbody = document.getElementById('experienceTableBody');
+  if (!tbody) return;
+
+  if (!list || list.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7">
+          <div class="table-empty">
+            <div class="icon">💼</div>
+            <p>No work experience added yet. Click "+ Add Experience" above.</p>
+          </div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  const sorted = [...list].sort((a, b) => (a.order || 0) - (b.order || 0));
+  tbody.innerHTML = sorted.map((exp, idx) => {
+    const id = exp._id || `exp_${idx}`;
+    const techs = Array.isArray(exp.technologies) ? exp.technologies.join(', ') : '';
+    return `
+      <tr>
+        <td><strong style="color:var(--text-primary);">${escapeHTML(exp.role)}</strong></td>
+        <td>${escapeHTML(exp.company)}</td>
+        <td><span class="badge badge-read">${escapeHTML(exp.period || 'Present')}</span></td>
+        <td>${escapeHTML(exp.location || '—')}</td>
+        <td><small style="color:var(--text-secondary);">${escapeHTML(techs || '—')}</small></td>
+        <td>${exp.order || 0}</td>
+        <td>
+          <div class="actions">
+            <button class="btn btn-secondary btn-sm" onclick="editExperience('${id}')">✏️</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteExperience('${id}')">🗑️</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function openExperienceModal(id = null) {
+  document.getElementById('expId').value = '';
+  document.getElementById('expRole').value = '';
+  document.getElementById('expCompany').value = '';
+  document.getElementById('expPeriod').value = '';
+  document.getElementById('expLocation').value = '';
+  document.getElementById('expDescription').value = '';
+  document.getElementById('expTechnologies').value = '';
+  document.getElementById('expOrder').value = '0';
+  document.getElementById('experienceModalTitle').textContent = 'Add Work Experience';
+
+  if (id && currentSiteProfile && Array.isArray(currentSiteProfile.experience)) {
+    const exp = currentSiteProfile.experience.find((e, idx) => String(e._id || `exp_${idx}`) === String(id));
+    if (exp) {
+      document.getElementById('experienceModalTitle').textContent = 'Edit Work Experience';
+      document.getElementById('expId').value = id;
+      document.getElementById('expRole').value = exp.role || '';
+      document.getElementById('expCompany').value = exp.company || '';
+      document.getElementById('expPeriod').value = exp.period || '';
+      document.getElementById('expLocation').value = exp.location || '';
+      document.getElementById('expDescription').value = exp.description || '';
+      document.getElementById('expTechnologies').value = Array.isArray(exp.technologies) ? exp.technologies.join(', ') : '';
+      document.getElementById('expOrder').value = exp.order || 0;
+    }
+  }
+
+  openModal('experienceModal');
+}
+
+function editExperience(id) {
+  openExperienceModal(id);
+}
+
+async function saveExperience() {
+  const id = document.getElementById('expId').value;
+  const role = document.getElementById('expRole').value.trim();
+  const company = document.getElementById('expCompany').value.trim();
+  const period = document.getElementById('expPeriod').value.trim();
+  const location = document.getElementById('expLocation').value.trim();
+  const description = document.getElementById('expDescription').value.trim();
+  const techStr = document.getElementById('expTechnologies').value.trim();
+  const order = parseInt(document.getElementById('expOrder').value) || 0;
+
+  if (!role || !company) {
+    showToast('Role and Company are required', 'error');
+    return;
+  }
+
+  const technologies = techStr ? techStr.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+  if (!currentSiteProfile) currentSiteProfile = {};
+  if (!Array.isArray(currentSiteProfile.experience)) currentSiteProfile.experience = [];
+
+  if (id) {
+    const idx = currentSiteProfile.experience.findIndex((e, i) => String(e._id || `exp_${i}`) === String(id));
+    if (idx >= 0) {
+      currentSiteProfile.experience[idx] = {
+        ...currentSiteProfile.experience[idx],
+        role, company, period, location, description, technologies, order,
+      };
+    }
+  } else {
+    currentSiteProfile.experience.push({
+      role, company, period, location, description, technologies, order,
+    });
+  }
+
+  const result = await authFetch('/profile', {
+    method: 'PUT',
+    body: JSON.stringify(currentSiteProfile),
+  });
+
+  if (result && result.success) {
+    currentSiteProfile = result.data;
+    closeModal('experienceModal');
+    showToast('Experience saved successfully!');
+    renderExperienceAdmin(currentSiteProfile.experience || []);
+    updateStats();
+  } else {
+    showToast(result?.message || 'Failed to save experience', 'error');
+  }
+}
+
+function deleteExperience(id) {
+  confirmDelete('Delete this experience entry?', async () => {
+    if (!currentSiteProfile || !Array.isArray(currentSiteProfile.experience)) return;
+    currentSiteProfile.experience = currentSiteProfile.experience.filter((e, idx) => String(e._id || `exp_${idx}`) !== String(id));
+
+    const result = await authFetch('/profile', {
+      method: 'PUT',
+      body: JSON.stringify(currentSiteProfile),
+    });
+
+    if (result && result.success) {
+      currentSiteProfile = result.data;
+      showToast('Experience entry deleted');
+      renderExperienceAdmin(currentSiteProfile.experience || []);
+      updateStats();
+    } else {
+      showToast(result?.message || 'Failed to delete experience', 'error');
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════
+   FORMAL EDUCATION CRUD
+   ══════════════════════════════════════════════════ */
+
+function renderEducationAdmin(list) {
+  const tbody = document.getElementById('educationTableBody');
+  if (!tbody) return;
+
+  if (!list || list.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6">
+          <div class="table-empty">
+            <div class="icon">🎓</div>
+            <p>No education added yet. Click "+ Add Education" above.</p>
+          </div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  const sorted = [...list].sort((a, b) => (a.order || 0) - (b.order || 0));
+  tbody.innerHTML = sorted.map((edu, idx) => {
+    const id = edu._id || `edu_${idx}`;
+    return `
+      <tr>
+        <td><strong style="color:var(--text-primary);">${escapeHTML(edu.degree)}</strong></td>
+        <td>${escapeHTML(edu.institution)}</td>
+        <td><span class="badge badge-read">${escapeHTML(edu.year || '—')}</span></td>
+        <td>${escapeHTML(edu.grade || '—')}</td>
+        <td>${edu.order || 0}</td>
+        <td>
+          <div class="actions">
+            <button class="btn btn-secondary btn-sm" onclick="editEducation('${id}')">✏️</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteEducation('${id}')">🗑️</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function openEducationModal(id = null) {
+  document.getElementById('eduId').value = '';
+  document.getElementById('eduDegree').value = '';
+  document.getElementById('eduInstitution').value = '';
+  document.getElementById('eduYear').value = '';
+  document.getElementById('eduGrade').value = '';
+  document.getElementById('eduDescription').value = '';
+  document.getElementById('eduOrder').value = '0';
+  document.getElementById('educationModalTitle').textContent = 'Add Education';
+
+  if (id && currentSiteProfile && Array.isArray(currentSiteProfile.education)) {
+    const edu = currentSiteProfile.education.find((e, idx) => String(e._id || `edu_${idx}`) === String(id));
+    if (edu) {
+      document.getElementById('educationModalTitle').textContent = 'Edit Education';
+      document.getElementById('eduId').value = id;
+      document.getElementById('eduDegree').value = edu.degree || '';
+      document.getElementById('eduInstitution').value = edu.institution || '';
+      document.getElementById('eduYear').value = edu.year || '';
+      document.getElementById('eduGrade').value = edu.grade || '';
+      document.getElementById('eduDescription').value = edu.description || '';
+      document.getElementById('eduOrder').value = edu.order || 0;
+    }
+  }
+
+  openModal('educationModal');
+}
+
+function editEducation(id) {
+  openEducationModal(id);
+}
+
+async function saveEducation() {
+  const id = document.getElementById('eduId').value;
+  const degree = document.getElementById('eduDegree').value.trim();
+  const institution = document.getElementById('eduInstitution').value.trim();
+  const year = document.getElementById('eduYear').value.trim();
+  const grade = document.getElementById('eduGrade').value.trim();
+  const description = document.getElementById('eduDescription').value.trim();
+  const order = parseInt(document.getElementById('eduOrder').value) || 0;
+
+  if (!degree || !institution) {
+    showToast('Degree and Institution are required', 'error');
+    return;
+  }
+
+  if (!currentSiteProfile) currentSiteProfile = {};
+  if (!Array.isArray(currentSiteProfile.education)) currentSiteProfile.education = [];
+
+  if (id) {
+    const idx = currentSiteProfile.education.findIndex((e, i) => String(e._id || `edu_${i}`) === String(id));
+    if (idx >= 0) {
+      currentSiteProfile.education[idx] = {
+        ...currentSiteProfile.education[idx],
+        degree, institution, year, grade, description, order,
+      };
+    }
+  } else {
+    currentSiteProfile.education.push({
+      degree, institution, year, grade, description, order,
+    });
+  }
+
+  const result = await authFetch('/profile', {
+    method: 'PUT',
+    body: JSON.stringify(currentSiteProfile),
+  });
+
+  if (result && result.success) {
+    currentSiteProfile = result.data;
+    closeModal('educationModal');
+    showToast('Education saved successfully!');
+    renderEducationAdmin(currentSiteProfile.education || []);
+    updateStats();
+  } else {
+    showToast(result?.message || 'Failed to save education', 'error');
+  }
+}
+
+function deleteEducation(id) {
+  confirmDelete('Delete this education entry?', async () => {
+    if (!currentSiteProfile || !Array.isArray(currentSiteProfile.education)) return;
+    currentSiteProfile.education = currentSiteProfile.education.filter((e, idx) => String(e._id || `edu_${idx}`) !== String(id));
+
+    const result = await authFetch('/profile', {
+      method: 'PUT',
+      body: JSON.stringify(currentSiteProfile),
+    });
+
+    if (result && result.success) {
+      currentSiteProfile = result.data;
+      showToast('Education entry deleted');
+      renderEducationAdmin(currentSiteProfile.education || []);
+      updateStats();
+    } else {
+      showToast(result?.message || 'Failed to delete education', 'error');
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════
+   CERTIFICATIONS CRUD
+   ══════════════════════════════════════════════════ */
+
+function renderCertificationsAdmin(list) {
+  const tbody = document.getElementById('certificationsTableBody');
+  if (!tbody) return;
+
+  if (!list || list.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7">
+          <div class="table-empty">
+            <div class="icon">🏆</div>
+            <p>No certifications added yet. Click "+ Add Certification" above.</p>
+          </div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  const sorted = [...list].sort((a, b) => (a.order || 0) - (b.order || 0));
+  tbody.innerHTML = sorted.map((cert, idx) => {
+    const id = cert._id || `cert_${idx}`;
+    const linkPreview = cert.credentialUrl
+      ? `<a href="${cert.credentialUrl}" target="_blank" style="color:var(--text-accent);">🔗 View</a>`
+      : '—';
+    return `
+      <tr>
+        <td><strong style="color:var(--text-primary);">${escapeHTML(cert.title)}</strong></td>
+        <td>${escapeHTML(cert.issuer)}</td>
+        <td>${escapeHTML(cert.issueDate || '—')}</td>
+        <td><small style="color:var(--text-secondary);">${escapeHTML(cert.credentialId || '—')}</small></td>
+        <td>${linkPreview}</td>
+        <td>${cert.order || 0}</td>
+        <td>
+          <div class="actions">
+            <button class="btn btn-secondary btn-sm" onclick="editCertification('${id}')">✏️</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteCertification('${id}')">🗑️</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function openCertificationModal(id = null) {
+  document.getElementById('certId').value = '';
+  document.getElementById('certTitle').value = '';
+  document.getElementById('certIssuer').value = '';
+  document.getElementById('certIssueDate').value = '';
+  document.getElementById('certCredentialId').value = '';
+  document.getElementById('certCredentialUrl').value = '';
+  document.getElementById('certOrder').value = '0';
+  document.getElementById('certificationModalTitle').textContent = 'Add Certification';
+
+  if (id && currentSiteProfile && Array.isArray(currentSiteProfile.certifications)) {
+    const cert = currentSiteProfile.certifications.find((c, idx) => String(c._id || `cert_${idx}`) === String(id));
+    if (cert) {
+      document.getElementById('certificationModalTitle').textContent = 'Edit Certification';
+      document.getElementById('certId').value = id;
+      document.getElementById('certTitle').value = cert.title || '';
+      document.getElementById('certIssuer').value = cert.issuer || '';
+      document.getElementById('certIssueDate').value = cert.issueDate || '';
+      document.getElementById('certCredentialId').value = cert.credentialId || '';
+      document.getElementById('certCredentialUrl').value = cert.credentialUrl || '';
+      document.getElementById('certOrder').value = cert.order || 0;
+    }
+  }
+
+  openModal('certificationModal');
+}
+
+function editCertification(id) {
+  openCertificationModal(id);
+}
+
+async function saveCertification() {
+  const id = document.getElementById('certId').value;
+  const title = document.getElementById('certTitle').value.trim();
+  const issuer = document.getElementById('certIssuer').value.trim();
+  const issueDate = document.getElementById('certIssueDate').value.trim();
+  const credentialId = document.getElementById('certCredentialId').value.trim();
+  const credentialUrl = document.getElementById('certCredentialUrl').value.trim();
+  const order = parseInt(document.getElementById('certOrder').value) || 0;
+
+  if (!title || !issuer) {
+    showToast('Title and Issuer are required', 'error');
+    return;
+  }
+
+  if (!currentSiteProfile) currentSiteProfile = {};
+  if (!Array.isArray(currentSiteProfile.certifications)) currentSiteProfile.certifications = [];
+
+  if (id) {
+    const idx = currentSiteProfile.certifications.findIndex((c, i) => String(c._id || `cert_${i}`) === String(id));
+    if (idx >= 0) {
+      currentSiteProfile.certifications[idx] = {
+        ...currentSiteProfile.certifications[idx],
+        title, issuer, issueDate, credentialId, credentialUrl, order,
+      };
+    }
+  } else {
+    currentSiteProfile.certifications.push({
+      title, issuer, issueDate, credentialId, credentialUrl, order,
+    });
+  }
+
+  const result = await authFetch('/profile', {
+    method: 'PUT',
+    body: JSON.stringify(currentSiteProfile),
+  });
+
+  if (result && result.success) {
+    currentSiteProfile = result.data;
+    closeModal('certificationModal');
+    showToast('Certification saved successfully!');
+    renderCertificationsAdmin(currentSiteProfile.certifications || []);
+    updateStats();
+  } else {
+    showToast(result?.message || 'Failed to save certification', 'error');
+  }
+}
+
+function deleteCertification(id) {
+  confirmDelete('Delete this certification?', async () => {
+    if (!currentSiteProfile || !Array.isArray(currentSiteProfile.certifications)) return;
+    currentSiteProfile.certifications = currentSiteProfile.certifications.filter((c, idx) => String(c._id || `cert_${idx}`) !== String(id));
+
+    const result = await authFetch('/profile', {
+      method: 'PUT',
+      body: JSON.stringify(currentSiteProfile),
+    });
+
+    if (result && result.success) {
+      currentSiteProfile = result.data;
+      showToast('Certification deleted');
+      renderCertificationsAdmin(currentSiteProfile.certifications || []);
+      updateStats();
+    } else {
+      showToast(result?.message || 'Failed to delete certification', 'error');
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════
+   KEY ACHIEVEMENTS CRUD
+   ══════════════════════════════════════════════════ */
+
+function renderAchievementsAdmin(list) {
+  const tbody = document.getElementById('achievementsTableBody');
+  if (!tbody) return;
+
+  if (!list || list.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5">
+          <div class="table-empty">
+            <div class="icon">⚡</div>
+            <p>No achievements added yet. Click "+ Add Achievement" above.</p>
+          </div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  const sorted = [...list].sort((a, b) => (a.order || 0) - (b.order || 0));
+  tbody.innerHTML = sorted.map((ach, idx) => {
+    const id = ach._id || `ach_${idx}`;
+    return `
+      <tr>
+        <td><strong style="color:var(--text-primary);">${escapeHTML(ach.title)}</strong></td>
+        <td><small style="color:var(--text-secondary);">${escapeHTML(ach.description || '—')}</small></td>
+        <td>${escapeHTML(ach.date || '—')}</td>
+        <td>${ach.order || 0}</td>
+        <td>
+          <div class="actions">
+            <button class="btn btn-secondary btn-sm" onclick="editAchievement('${id}')">✏️</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteAchievement('${id}')">🗑️</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function openAchievementModal(id = null) {
+  document.getElementById('achieveId').value = '';
+  document.getElementById('achieveTitle').value = '';
+  document.getElementById('achieveDescription').value = '';
+  document.getElementById('achieveDate').value = '';
+  document.getElementById('achieveOrder').value = '0';
+  document.getElementById('achievementModalTitle').textContent = 'Add Achievement';
+
+  if (id && currentSiteProfile && Array.isArray(currentSiteProfile.achievements)) {
+    const ach = currentSiteProfile.achievements.find((a, idx) => String(a._id || `ach_${idx}`) === String(id));
+    if (ach) {
+      document.getElementById('achievementModalTitle').textContent = 'Edit Achievement';
+      document.getElementById('achieveId').value = id;
+      document.getElementById('achieveTitle').value = ach.title || '';
+      document.getElementById('achieveDescription').value = ach.description || '';
+      document.getElementById('achieveDate').value = ach.date || '';
+      document.getElementById('achieveOrder').value = ach.order || 0;
+    }
+  }
+
+  openModal('achievementModal');
+}
+
+function editAchievement(id) {
+  openAchievementModal(id);
+}
+
+async function saveAchievement() {
+  const id = document.getElementById('achieveId').value;
+  const title = document.getElementById('achieveTitle').value.trim();
+  const description = document.getElementById('achieveDescription').value.trim();
+  const date = document.getElementById('achieveDate').value.trim();
+  const order = parseInt(document.getElementById('achieveOrder').value) || 0;
+
+  if (!title) {
+    showToast('Achievement title is required', 'error');
+    return;
+  }
+
+  if (!currentSiteProfile) currentSiteProfile = {};
+  if (!Array.isArray(currentSiteProfile.achievements)) currentSiteProfile.achievements = [];
+
+  if (id) {
+    const idx = currentSiteProfile.achievements.findIndex((a, i) => String(a._id || `ach_${i}`) === String(id));
+    if (idx >= 0) {
+      currentSiteProfile.achievements[idx] = {
+        ...currentSiteProfile.achievements[idx],
+        title, description, date, order,
+      };
+    }
+  } else {
+    currentSiteProfile.achievements.push({
+      title, description, date, order,
+    });
+  }
+
+  const result = await authFetch('/profile', {
+    method: 'PUT',
+    body: JSON.stringify(currentSiteProfile),
+  });
+
+  if (result && result.success) {
+    currentSiteProfile = result.data;
+    closeModal('achievementModal');
+    showToast('Achievement saved successfully!');
+    renderAchievementsAdmin(currentSiteProfile.achievements || []);
+    updateStats();
+  } else {
+    showToast(result?.message || 'Failed to save achievement', 'error');
+  }
+}
+
+function deleteAchievement(id) {
+  confirmDelete('Delete this achievement?', async () => {
+    if (!currentSiteProfile || !Array.isArray(currentSiteProfile.achievements)) return;
+    currentSiteProfile.achievements = currentSiteProfile.achievements.filter((a, idx) => String(a._id || `ach_${idx}`) !== String(id));
+
+    const result = await authFetch('/profile', {
+      method: 'PUT',
+      body: JSON.stringify(currentSiteProfile),
+    });
+
+    if (result && result.success) {
+      currentSiteProfile = result.data;
+      showToast('Achievement deleted');
+      renderAchievementsAdmin(currentSiteProfile.achievements || []);
+      updateStats();
+    } else {
+      showToast(result?.message || 'Failed to delete achievement', 'error');
+    }
+  });
 }
 
 /* ══════════════════════════════════════════════════

@@ -380,76 +380,286 @@ function initTextReveal() {
 }
 
 async function loadProfileSettings() {
+  const CACHE_KEY = 'portfolio_cached_profile';
+
+  // Apply cached profile immediately if available
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      applyProfileData(JSON.parse(cached));
+    }
+  } catch (e) { /* ignore cache parse error */ }
+
   try {
     const res = await fetch(`${API_BASE}/profile`);
     const result = await res.json();
     if (result.data) {
-      const p = result.data;
-
-      // Hero
-      const heroTitleEl = document.getElementById('heroTitle');
-      if (heroTitleEl && p.heroTitle) {
-        heroTitleEl.innerHTML = p.heroTitle.replace(/\n/g, '<br>');
-      }
-
-      const heroSubEl = document.getElementById('heroSubtitle');
-      if (heroSubEl && p.heroSubtitle) {
-        heroSubEl.innerHTML = p.heroSubtitle.replace(/\n/g, '<br>');
-      }
-
-      // About / Profile
-      const aboutBioEl = document.getElementById('aboutBio');
-      if (aboutBioEl && p.aboutBio) {
-        aboutBioEl.textContent = p.aboutBio;
-      }
-
-      const aboutSpecEl = document.getElementById('aboutSpecialization');
-      if (aboutSpecEl && p.aboutSpecialization) {
-        aboutSpecEl.textContent = p.aboutSpecialization;
-      }
-
-      const aboutHighlightEl = document.getElementById('aboutHighlight');
-      if (aboutHighlightEl && p.aboutHighlight) {
-        aboutHighlightEl.textContent = p.aboutHighlight;
-      }
-
-      const aboutImgEl = document.getElementById('aboutImage');
-      if (aboutImgEl && p.profileImage) {
-        aboutImgEl.src = p.profileImage;
-        if (p.name) aboutImgEl.alt = p.name;
-      }
-
-      // Re-initialize text reveal for dynamic about text
-      initTextReveal();
-
-      // Contact Email
-      const emailEl = document.getElementById('displayContactEmail');
-      if (emailEl && p.contactEmail) {
-        emailEl.textContent = p.contactEmail;
-      }
-
-      // Marquee Text
-      const marqueeEl = document.getElementById('marqueeContent');
-      if (marqueeEl && p.marqueeText) {
-        const text = p.marqueeText;
-        marqueeEl.innerHTML = `
-          <span>${text}</span>
-          <span>◆</span>
-          <span>${text}</span>
-          <span>◆</span>
-        `;
-      }
-
-      // Dynamic Resume Path (if configured in profile settings)
-      if (p.resumeUrl) {
-        window.PORTFOLIO_CONFIG.resumeUrl = p.resumeUrl;
-        updateResumeLinks();
-      }
-
+      applyProfileData(result.data);
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify(result.data));
+      } catch (e) { /* ignore */ }
     }
   } catch (e) {
     console.error('Error loading profile settings', e);
   }
+}
+
+function applyProfileData(p) {
+  if (!p) return;
+
+  // Hero
+  const heroTitleEl = document.getElementById('heroTitle');
+  if (heroTitleEl && p.heroTitle) {
+    heroTitleEl.innerHTML = p.heroTitle.replace(/\n/g, '<br>');
+  }
+
+  const heroSubEl = document.getElementById('heroSubtitle');
+  if (heroSubEl && p.heroSubtitle) {
+    heroSubEl.innerHTML = p.heroSubtitle.replace(/\n/g, '<br>');
+  }
+
+  // About / Profile
+  const aboutBioEl = document.getElementById('aboutBio');
+  if (aboutBioEl && p.aboutBio) {
+    aboutBioEl.textContent = p.aboutBio;
+  }
+
+  const aboutSpecEl = document.getElementById('aboutSpecialization');
+  if (aboutSpecEl && p.aboutSpecialization) {
+    aboutSpecEl.textContent = p.aboutSpecialization;
+  }
+
+  const aboutHighlightEl = document.getElementById('aboutHighlight');
+  if (aboutHighlightEl && p.aboutHighlight) {
+    aboutHighlightEl.textContent = p.aboutHighlight;
+  }
+
+  const aboutImgEl = document.getElementById('aboutImage');
+  if (aboutImgEl && p.profileImage) {
+    aboutImgEl.src = p.profileImage;
+    if (p.name) aboutImgEl.alt = p.name;
+  }
+
+  // Re-initialize text reveal for dynamic about text
+  initTextReveal();
+
+  // Contact Details
+  const emailEl = document.getElementById('displayContactEmail');
+  if (emailEl && p.contactEmail) {
+    emailEl.textContent = p.contactEmail;
+  }
+
+  const phoneEl = document.getElementById('displayContactPhone');
+  if (phoneEl && p.contactPhone) {
+    phoneEl.textContent = p.contactPhone;
+  }
+
+  const locEl = document.getElementById('displayContactLocation');
+  if (locEl && p.contactLocation) {
+    locEl.textContent = p.contactLocation;
+  }
+
+  // Marquee Text
+  const marqueeEl = document.getElementById('marqueeContent');
+  if (marqueeEl && p.marqueeText) {
+    const text = p.marqueeText;
+    marqueeEl.innerHTML = `
+      <span>${text}</span>
+      <span>◆</span>
+      <span>${text}</span>
+      <span>◆</span>
+    `;
+  }
+
+  // Dynamic Resume Path
+  if (p.resumeUrl) {
+    window.PORTFOLIO_CONFIG.resumeUrl = p.resumeUrl;
+    updateResumeLinks();
+  }
+
+  // Render Experience & Education
+  if (Array.isArray(p.experience)) {
+    renderExperience(p.experience);
+    const statExp = document.getElementById('statExp');
+    if (statExp) statExp.textContent = `${p.experience.length}+`;
+    const expCountBadge = document.getElementById('expCountBadge');
+    if (expCountBadge) expCountBadge.textContent = `${p.experience.length} ROLES`;
+  }
+
+  if (Array.isArray(p.education)) {
+    renderEducation(p.education);
+    const eduCountBadge = document.getElementById('eduCountBadge');
+    if (eduCountBadge) eduCountBadge.textContent = `${p.education.length} DEGREES`;
+  }
+
+  // Render Certifications & Achievements
+  if (Array.isArray(p.certifications)) {
+    renderCertifications(p.certifications);
+    const statCerts = document.getElementById('statCerts');
+    if (statCerts) statCerts.textContent = `${p.certifications.length}+`;
+  }
+
+  if (Array.isArray(p.achievements)) {
+    renderAchievements(p.achievements);
+  }
+
+  // Render Social Links
+  if (Array.isArray(p.socialLinks)) {
+    renderSocialLinks(p.socialLinks);
+  }
+}
+
+function renderExperience(list) {
+  const container = document.getElementById('experienceTimeline');
+  if (!container) return;
+  if (!list || list.length === 0) {
+    container.innerHTML = '<p style="color:var(--text-secondary); font-size:0.9rem;">No experience items listed yet.</p>';
+    return;
+  }
+
+  const sorted = [...list].sort((a, b) => (a.order || 0) - (b.order || 0));
+  container.innerHTML = sorted.map((exp) => {
+    const techTags = Array.isArray(exp.technologies) && exp.technologies.length > 0
+      ? `<div class="timeline-tags">
+          ${exp.technologies.map(t => `<span class="timeline-tag-pill">${t}</span>`).join('')}
+         </div>`
+      : '';
+
+    return `
+      <div class="timeline-card">
+        <div class="timeline-header">
+          <h3 class="timeline-title">${exp.role}</h3>
+          <span class="timeline-period-badge">${exp.period || 'Present'}</span>
+        </div>
+        <div class="timeline-subtitle">
+          <span>🏢 ${exp.company}</span>
+          ${exp.location ? `<span>• 📍 ${exp.location}</span>` : ''}
+        </div>
+        ${exp.description ? `<p class="timeline-desc">${exp.description}</p>` : ''}
+        ${techTags}
+      </div>
+    `;
+  }).join('');
+}
+
+function renderEducation(list) {
+  const container = document.getElementById('educationTimeline');
+  if (!container) return;
+  if (!list || list.length === 0) {
+    container.innerHTML = '<p style="color:var(--text-secondary); font-size:0.9rem;">No education items listed yet.</p>';
+    return;
+  }
+
+  const sorted = [...list].sort((a, b) => (a.order || 0) - (b.order || 0));
+  container.innerHTML = sorted.map((edu) => {
+    const gradeBadge = edu.grade
+      ? `<div class="timeline-grade-badge">🎓 ${edu.grade}</div>`
+      : '';
+
+    return `
+      <div class="timeline-card">
+        <div class="timeline-header">
+          <h3 class="timeline-title">${edu.degree}</h3>
+          <span class="timeline-period-badge">${edu.year || ''}</span>
+        </div>
+        <div class="timeline-subtitle">
+          <span>🏛️ ${edu.institution}</span>
+        </div>
+        ${gradeBadge}
+        ${edu.description ? `<p class="timeline-desc">${edu.description}</p>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+function renderCertifications(list) {
+  const container = document.getElementById('certificationsGrid');
+  if (!container) return;
+  if (!list || list.length === 0) {
+    container.innerHTML = '<p style="color:var(--text-secondary); font-size:0.9rem;">No certifications added yet.</p>';
+    return;
+  }
+
+  const sorted = [...list].sort((a, b) => (a.order || 0) - (b.order || 0));
+  container.innerHTML = sorted.map((c) => {
+    const credBtn = c.credentialUrl
+      ? `<a href="${c.credentialUrl}" target="_blank" rel="noopener noreferrer" class="cert-link-btn">
+          <span>Verify Credential</span>
+          <span>→</span>
+         </a>`
+      : '<span style="font-size:0.75rem; color:var(--text-secondary);">Verified</span>';
+
+    return `
+      <div class="cert-card">
+        <div class="cert-top">
+          <div>
+            <h4 class="cert-title">${c.title}</h4>
+            <div class="cert-issuer">📜 ${c.issuer}</div>
+          </div>
+          ${c.issueDate ? `<span class="cert-date">${c.issueDate}</span>` : ''}
+        </div>
+        <div class="cert-footer">
+          <span class="cert-id">${c.credentialId ? `ID: ${c.credentialId}` : 'Certified'}</span>
+          ${credBtn}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderAchievements(list) {
+  const container = document.getElementById('achievementsGrid');
+  if (!container) return;
+  if (!list || list.length === 0) {
+    container.innerHTML = '<p style="color:var(--text-secondary); font-size:0.9rem;">No achievements added yet.</p>';
+    return;
+  }
+
+  const sorted = [...list].sort((a, b) => (a.order || 0) - (b.order || 0));
+  container.innerHTML = sorted.map((ach) => `
+    <div class="achieve-card">
+      <div class="achieve-title">
+        <span>⚡ ${ach.title}</span>
+        ${ach.date ? `<span class="achieve-date">${ach.date}</span>` : ''}
+      </div>
+      ${ach.description ? `<p class="achieve-desc">${ach.description}</p>` : ''}
+    </div>
+  `).join('');
+}
+
+function renderSocialLinks(list) {
+  const container = document.getElementById('socialLinksContainer');
+  if (!container) return;
+  if (!list || list.length === 0) {
+    container.innerHTML = '<span style="color:var(--text-secondary); font-size:0.85rem;">No social links added yet.</span>';
+    return;
+  }
+
+  const platformIcons = {
+    github: '🐙',
+    linkedin: '💼',
+    twitter: '🐦',
+    email: '✉️',
+    instagram: '📸',
+    portfolio: '🌐',
+    leetcode: '⚡',
+  };
+
+  const sorted = [...list].sort((a, b) => (a.order || 0) - (b.order || 0));
+  container.innerHTML = sorted.map((s) => {
+    const icon = platformIcons[(s.platform || '').toLowerCase()] || '🔗';
+    const label = s.label || s.platform || 'Link';
+    const href = s.url.startsWith('mailto:') || s.url.startsWith('http')
+      ? s.url
+      : `https://${s.url}`;
+
+    return `
+      <a href="${href}" target="_blank" rel="noopener noreferrer" class="social-link-pill">
+        <span>${icon}</span>
+        <span>${label}</span>
+      </a>
+    `;
+  }).join('');
 }
 
 /**

@@ -1,0 +1,126 @@
+{
+  "_id": "6aa9879cd9dde0fe8d17509f",
+  "heroTitle": "FULL STACK &\nMERN STACK\nDEVELOPER",
+  "heroSubtitle": "Crafting digital experiences\nwith precision.",
+  "name": "Anshul Kaundal",
+  "profileImage": "me_pfp.jpg",
+  "aboutBio": "Hi, I'm Anshul Kaundal, a passionate MERN Stack Developer and Computer Science student who enjoys building modern, responsive, and user-friendly web applications.",
+  "aboutSpecialization": "I specialize in MongoDB, Express.js, React.js, and Node.js, with a strong interest in creating scalable full-stack solutions. I love turning ideas into functional digital experiences while continuously learning and exploring new technologies.",
+  "aboutHighlight": "Building. Learning. Creating. One project at a time.",
+  "contactEmail": "kaundalanshul725@gmail.com",
+  "marqueeText": "ANSHUL KAUNDAL PORTFOLIO © 2026 ◆ FULL STACK DEVELOPER ◆ AVAILABLE FOR WORK",
+  "hobbies": [
+    {
+      "title": "MUSIC",
+      "image": "hobby_music.jpg",
+      "num": "01",
+      "_id": "6acdf12657c18c2da0d78684"
+    },
+    {
+      "title": "TRAVEL",
+      "image": "hobby_travel.jpg",
+      "num": "02",
+      "_id": "6acdf12657c18c2da0d78685"
+    },
+    {
+      "title": "READING",
+      "image": "hobby_reading.jpg",
+      "num": "03",
+      "_id": "6acdf12657c18c2da0d78686"
+    }
+  ],
+  "createdAt": "2026-09-15T17:59:56.873Z",
+  "updatedAt": "2026-10-13T08:51:50.857Z",
+  "achievements": [
+    {
+      "_id": "6acdf11e57c18c2da0d785fb",
+      "title": "Engineered & Deployed GroceryStore E-Commerce System",
+      "description": "Built end-to-end e-commerce platform with real-time cart, product catalog, chatbot integration, and admin portal hosted live on Render.",
+      "date": "2026",
+      "order": 1
+    }
+  ],
+  "certifications": [
+    {
+      "_id": "6acdf11e57c18c2da0d785f9",
+      "title": "Full Stack Web Development with MERN",
+      "issuer": "Coursera / Udemy",
+      "issueDate": "2025",
+      "credentialUrl": "https://coursera.org",
+      "credentialId": "CERT-MERN-2025",
+      "order": 1
+    },
+    {
+      "_id": "6acdf11e57c18c2da0d785fa",
+      "title": "Data Structures & Algorithms in JavaScript",
+      "issuer": "HackerRank / freeCodeCamp",
+      "issueDate": "2024",
+      "credentialUrl": "https://hackerrank.com",
+      "credentialId": "CERT-DSA-2024",
+      "order": 2
+    }
+  ],
+  "contactLocation": "India",
+  "contactPhone": "+91 98765 43210",
+  "education": [
+    {
+      "_id": "6acdf11e57c18c2da0d785f7",
+      "degree": "Bachelor of Technology in Computer Science & Engineering",
+      "institution": "APG Shimla University",
+      "year": "2022 — 2026",
+      "grade": "CGPA: 8.5/10",
+      "description": "Core coursework in Data Structures, Algorithms, Object-Oriented Programming, Database Management Systems, and Full Stack Web Engineering.",
+      "order": 1
+    }
+  ],
+  "experience": [
+    {
+      "_id": "6acdf11e57c18c2da0d785f8",
+      "role": "Full Stack MERN Developer",
+      "company": "Freelance & Independent Projects",
+      "period": "2024 — Present",
+      "location": "Remote",
+      "description": "Architected and deployed full-featured web applications including the GroceryStore E-Commerce Platform. Designed resilient RESTful backend APIs and built interactive React user interfaces.",
+      "technologies": [
+        "React",
+        "Node.js",
+        "Express.js",
+        "MongoDB",
+        "REST APIs",
+        "Render"
+      ],
+      "order": 1
+    }
+  ],
+  "resumeUrl": "resume.pdf",
+  "socialLinks": [
+    {
+      "_id": "6acdf11e57c18c2da0d785f3",
+      "platform": "github",
+      "label": "GitHub",
+      "url": "https://github.com/kaundalanshul",
+      "order": 1
+    },
+    {
+      "_id": "6acdf11e57c18c2da0d785f4",
+      "platform": "linkedin",
+      "label": "LinkedIn",
+      "url": "https://linkedin.com/in/anshul-kaundal",
+      "order": 2
+    },
+    {
+      "_id": "6acdf11e57c18c2da0d785f5",
+      "platform": "twitter",
+      "label": "Twitter / X",
+      "url": "https://twitter.com",
+      "order": 3
+    },
+    {
+      "_id": "6acdf11e57c18c2da0d785f6",
+      "platform": "email",
+      "label": "Email",
+      "url": "mailto:kaundalanshul725@gmail.com",
+      "order": 4
+    }
+  ]
+}

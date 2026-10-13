@@ -7,6 +7,7 @@
  */
 
 const Profile = require('../models/Profile');
+const { syncProfileToDisk, getPersistentProfile } = require('../utils/profileStorage');
 
 /**
  * GET /api/profile
@@ -16,7 +17,9 @@ const getProfile = async (req, res, next) => {
   try {
     let profile = await Profile.findOne();
     if (!profile) {
-      profile = await Profile.create({});
+      const diskData = getPersistentProfile();
+      profile = await Profile.create(diskData || {});
+      syncProfileToDisk(profile);
     }
 
     res.json({
@@ -38,13 +41,16 @@ const updateProfile = async (req, res, next) => {
     if (!profile) {
       profile = await Profile.create(req.body);
     } else {
-      Object.assign(profile, req.body);
+      profile.set(req.body);
       await profile.save();
     }
 
+    // Keep disk backup 100% synchronized
+    syncProfileToDisk(profile);
+
     res.json({
       success: true,
-      message: 'Profile updated successfully',
+      message: 'Profile and site content updated successfully',
       data: profile,
     });
   } catch (error) {

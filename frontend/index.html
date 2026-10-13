@@ -22,9 +22,11 @@
   <nav class="navbar" id="navbar">
     <a href="#hero" class="nav-logo">HOME</a>
     <a href="#about" class="nav-link">ABOUT</a>
+    <a href="#journey" class="nav-link">JOURNEY</a>
     <a href="#portfolio" class="nav-link">PORTFOLIO</a>
     <a href="#hobbies" class="nav-link">INTERESTS</a>
     <a href="#skills" class="nav-link">SKILLS</a>
+    <a href="#certifications" class="nav-link">CREDENTIALS</a>
     <a href="#contact" class="nav-link">GET IN TOUCH</a>
     <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu">
       <span></span>
@@ -37,9 +39,11 @@
   <div class="mobile-nav-overlay" id="mobileNavOverlay">
     <a href="#hero" class="mobile-nav-link">HOME</a>
     <a href="#about" class="mobile-nav-link">ABOUT</a>
+    <a href="#journey" class="mobile-nav-link">JOURNEY</a>
     <a href="#portfolio" class="mobile-nav-link">PORTFOLIO</a>
     <a href="#hobbies" class="mobile-nav-link">INTERESTS</a>
     <a href="#skills" class="mobile-nav-link">SKILLS</a>
+    <a href="#certifications" class="mobile-nav-link">CREDENTIALS</a>
     <a href="#contact" class="mobile-nav-link">GET IN TOUCH</a>
   </div>
 
@@ -77,6 +81,14 @@
             <span class="stat-num" id="statSkills">0+</span>
             <span class="stat-label">Skills</span>
           </div>
+          <div class="stat">
+            <span class="stat-num" id="statExp">2+</span>
+            <span class="stat-label">Roles</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num" id="statCerts">3+</span>
+            <span class="stat-label">Certificates</span>
+          </div>
         </div>
 
         <!-- Action Buttons: Get in Touch & Resume -->
@@ -98,6 +110,36 @@
             </svg>
             <span>Resume</span>
           </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Journey Section (Experience & Education) -->
+  <section class="journey" id="journey">
+    <div class="container">
+      <h2 class="section-title text-center">JOURNEY & EDUCATION</h2>
+      <div class="journey-grid">
+        <!-- Work Experience Column -->
+        <div class="journey-column">
+          <div class="journey-col-title">
+            <span>💼 WORK EXPERIENCE</span>
+            <span id="expCountBadge" style="font-size:0.75rem; color:var(--text-secondary);">0 ROLES</span>
+          </div>
+          <div class="timeline-list" id="experienceTimeline">
+            <!-- Populated dynamically by JS -->
+          </div>
+        </div>
+
+        <!-- Education Column -->
+        <div class="journey-column">
+          <div class="journey-col-title">
+            <span>🎓 FORMAL EDUCATION</span>
+            <span id="eduCountBadge" style="font-size:0.75rem; color:var(--text-secondary);">0 DEGREES</span>
+          </div>
+          <div class="timeline-list" id="educationTimeline">
+            <!-- Populated dynamically by JS -->
+          </div>
         </div>
       </div>
     </div>
@@ -243,6 +285,28 @@
       <h2 class="section-title text-center">EXPERTISE</h2>
       <div class="skills-grid" id="skillsGrid">
         <!-- Populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Credentials & Key Achievements Section -->
+  <section class="credentials-section" id="certifications">
+    <div class="container">
+      <h2 class="section-title text-center">CREDENTIALS & ACHIEVEMENTS</h2>
+
+      <div style="margin-top: 30px;">
+        <h3 class="skill-category-title">🏆 CERTIFICATIONS</h3>
+        <div class="certs-grid" id="certificationsGrid">
+          <!-- Populated dynamically by JS -->
+        </div>
+      </div>
+
+      <div style="margin-top: 40px;">
+        <h3 class="skill-category-title">⚡ KEY ACHIEVEMENTS</h3>
+        <div class="achieve-grid" id="achievementsGrid">
+          <!-- Populated dynamically by JS -->
+        </div>
+      </div>
     </div>
   </section>
 
@@ -251,7 +315,31 @@
     <div class="container editorial-layout">
       <div class="col">
         <h2 class="section-title">LET'S TALK</h2>
+
+        <div class="availability-badge" id="availabilityBadge">
+          <span class="pulse-dot"></span>
+          <span>AVAILABLE FOR FULL-STACK WORK</span>
+        </div>
+
         <p class="contact-email" id="displayContactEmail">kaundalanshul725@gmail.com</p>
+
+        <div class="contact-meta-group">
+          <div class="contact-meta-item" id="contactPhoneRow">
+            <span>📞</span>
+            <span id="displayContactPhone">+91 98765 43210</span>
+          </div>
+          <div class="contact-meta-item" id="contactLocationRow">
+            <span>📍</span>
+            <span id="displayContactLocation">India</span>
+          </div>
+        </div>
+
+        <div style="margin-top: 24px;">
+          <span style="font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 12px;">CONNECT DIRECTLY</span>
+          <div class="social-links-container" id="socialLinksContainer">
+            <!-- Populated dynamically by JS -->
+          </div>
+        </div>
       </div>
       <div class="col">
         <form class="contact-form" id="contactForm">

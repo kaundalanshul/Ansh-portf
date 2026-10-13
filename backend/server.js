@@ -132,6 +132,16 @@ const startServer = async () => {
     const { initInterestSync } = require('./utils/interestStorage');
     await initInterestSync(Interest);
 
+    // Sync skills between MongoDB and persistent disk storage
+    const Skill = require('./models/Skill');
+    const { initSkillSync } = require('./utils/skillStorage');
+    await initSkillSync(Skill);
+
+    // Sync profile and site content between MongoDB and persistent disk storage
+    const Profile = require('./models/Profile');
+    const { initProfileSync } = require('./utils/profileStorage');
+    await initProfileSync(Profile);
+
     // Start listening
     const server = app.listen(PORT, () => {
       console.log(`\n🚀 Backend API running on http://localhost:${PORT}`);
