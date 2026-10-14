@@ -1,7 +1,7 @@
 /**
  * Upload & Image Controller
  * ─────────────────────────
- * Handles persistent image and file storage in MongoDB with disk cache.
+ * Handles persistent image and file storage in Cloudinary with MongoDB Atlas fallback.
  */
 
 const { saveImage, getImageById, deleteImageById } = require('../utils/imageStorage');
@@ -78,24 +78,24 @@ const uploadFile = async (req, res, next) => {
       });
     }
 
-    // Persist to MongoDB Atlas and disk cache
+    // Persist to Cloudinary or MongoDB Atlas
     const savedDoc = await saveImage({
       filename,
       contentType,
       buffer,
     });
 
-    // Generate absolute and relative image URLs
-    const relativeUrl = `/api/images/${savedDoc._id}`;
-
     res.status(201).json({
       success: true,
-      message: 'Image uploaded and stored persistently in database.',
-      url: relativeUrl,
+      message: savedDoc.cloudinaryUrl
+        ? 'Image uploaded to Cloudinary CDN successfully.'
+        : 'Image stored persistently in database.',
+      url: savedDoc.url,
       id: savedDoc._id,
       filename: savedDoc.filename,
       contentType: savedDoc.contentType,
       size: savedDoc.size,
+      cloudinaryUrl: savedDoc.cloudinaryUrl,
     });
   } catch (err) {
     next(err);
@@ -116,14 +116,26 @@ const getImage = async (req, res, next) => {
 
     const image = await getImageById(id);
 
-    if (!image || !image.data) {
+    if (!image) {
       return res.status(404).json({
         success: false,
         message: 'Image not found.',
       });
     }
 
-    // Set CORS header specifically to allow cross-origin embedding everywhere
+    // If hosted on Cloudinary, redirect client to high-speed CDN URL
+    if (image.redirectUrl) {
+      return res.redirect(302, image.redirectUrl);
+    }
+
+    if (!image.data) {
+      return res.status(404).json({
+        success: false,
+        message: 'Image binary data not found.',
+      });
+    }
+
+    // Set CORS headers specifically to allow cross-origin embedding everywhere
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Content-Type', image.contentType);
     res.setHeader('Content-Length', image.data.length);

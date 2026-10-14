@@ -19,7 +19,15 @@ function resolveImageUrl(url) {
   url = String(url).trim();
   if (!url) return '';
   if (url.startsWith('data:')) return url;
+
+  // Strip out hardcoded localhost or 127.0.0.1 origins (e.g. from local development testing)
+  if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(url)) {
+    url = url.replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i, '');
+  }
+
+  // External CDN URLs (Cloudinary, Unsplash, external images)
   if (/^https?:\/\//i.test(url)) return url;
+
   const apiRoot = API_BASE.replace(/\/api\/?$/, '');
   if (url.startsWith('/api/')) return `${apiRoot}${url}`;
   if (url.startsWith('api/')) return `${apiRoot}/${url}`;

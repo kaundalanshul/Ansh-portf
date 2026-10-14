@@ -15,10 +15,19 @@ const imageSchema = new mongoose.Schema(
     size: {
       type: Number,
       required: true,
+      default: 0,
     },
     data: {
       type: Buffer,
-      required: true,
+      required: false,
+    },
+    cloudinaryUrl: {
+      type: String,
+      trim: true,
+    },
+    cloudinaryPublicId: {
+      type: String,
+      trim: true,
     },
   },
   {
@@ -26,7 +35,7 @@ const imageSchema = new mongoose.Schema(
   }
 );
 
-// Add index on createdAt for sorting / cleanup if needed
+// Index on createdAt for fast sorting / queries
 imageSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model('Image', imageSchema);

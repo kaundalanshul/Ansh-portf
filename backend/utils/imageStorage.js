@@ -1,14 +1,20 @@
 /**
  * Image Storage & Cache Utility
  * ──────────────────────────────
- * Provides dual storage for uploaded photos:
- * 1. Primary: MongoDB Atlas (persistent in cloud, survives Render restarts)
- * 2. Secondary Cache: Local backend/uploads directory for fast disk access
+ * Provides multi-tier reliable persistence for portfolio uploads:
+ * 1. Tier 1 (CDN): Cloudinary (if configured with CLOUDINARY_URL or credentials)
+ * 2. Tier 2 (Database): MongoDB Atlas binary buffer (survives Render restarts)
+ * 3. Tier 3 (Local Cache): backend/uploads directory for fast disk access
  */
 
 const fs = require('fs');
 const path = require('path');
 const Image = require('../models/Image');
+const {
+  isCloudinaryConfigured,
+  uploadBufferToCloudinary,
+  deleteFromCloudinary,
+} = require('../config/cloudinary');
 
 const UPLOADS_DIR = path.join(__dirname, '..', 'uploads');
 
@@ -24,22 +30,49 @@ function ensureUploadsDir() {
 }
 
 /**
- * Save an image to MongoDB and disk cache
+ * Save an image with reliable persistence
  * @param {Object} options - { filename, contentType, buffer }
- * @returns {Promise<Object>} Created image document
+ * @returns {Promise<Object>} { _id, url, filename, contentType, size }
  */
 async function saveImage({ filename, contentType, buffer }) {
   ensureUploadsDir();
 
-  // 1. Save to MongoDB
-  const imageDoc = await Image.create({
+  let cloudinaryUrl = null;
+  let cloudinaryPublicId = null;
+
+  // 1. Try Cloudinary if credentials are provided in environment
+  if (isCloudinaryConfigured()) {
+    try {
+      console.log(`☁️  Uploading "${filename}" to Cloudinary...`);
+      const cResult = await uploadBufferToCloudinary(buffer, {
+        filename,
+        resource_type: contentType.includes('pdf') ? 'raw' : 'image',
+      });
+      cloudinaryUrl = cResult.url;
+      cloudinaryPublicId = cResult.public_id;
+      console.log(`✅ Uploaded to Cloudinary: ${cloudinaryUrl}`);
+    } catch (cErr) {
+      console.warn('⚠️  Cloudinary upload failed, falling back to MongoDB Atlas:', cErr.message);
+    }
+  }
+
+  // 2. Persist metadata (and binary buffer if not on Cloudinary) to MongoDB
+  const imageDocData = {
     filename: filename || 'upload.jpg',
     contentType: contentType || 'image/jpeg',
     size: buffer.length,
-    data: buffer,
-  });
+    cloudinaryUrl,
+    cloudinaryPublicId,
+  };
 
-  // 2. Cache to disk using document ID as filename base
+  // Only store binary buffer in MongoDB if Cloudinary is not used, to optimize DB storage
+  if (!cloudinaryUrl) {
+    imageDocData.data = buffer;
+  }
+
+  const imageDoc = await Image.create(imageDocData);
+
+  // 3. Cache to disk using document ID as filename base
   try {
     const ext = getExtensionFromMime(contentType) || path.extname(filename) || '.jpg';
     const diskPath = path.join(UPLOADS_DIR, `${imageDoc._id}${ext}`);
@@ -48,33 +81,55 @@ async function saveImage({ filename, contentType, buffer }) {
     console.warn('⚠️  Could not write disk cache for image:', diskErr.message);
   }
 
-  return imageDoc;
+  // Determine final public URL
+  const publicUrl = cloudinaryUrl || `/api/images/${imageDoc._id}`;
+
+  return {
+    _id: imageDoc._id,
+    url: publicUrl,
+    filename: imageDoc.filename,
+    contentType: imageDoc.contentType,
+    size: imageDoc.size,
+    cloudinaryUrl,
+  };
 }
 
 /**
- * Get an image by ID (from MongoDB or disk cache)
+ * Get an image by ID (from Cloudinary redirect, MongoDB buffer, or disk cache)
  * @param {string} id - Image ObjectId
- * @returns {Promise<Object|null>} { data, contentType, filename }
+ * @returns {Promise<Object|null>} { data, contentType, filename, redirectUrl }
  */
 async function getImageById(id) {
   try {
     const doc = await Image.findById(id);
-    if (doc && doc.data) {
-      return {
-        data: doc.data,
-        contentType: doc.contentType || 'image/jpeg',
-        filename: doc.filename,
-      };
+    if (doc) {
+      // If hosted on Cloudinary, return the secure CDN URL for redirect
+      if (doc.cloudinaryUrl) {
+        return {
+          redirectUrl: doc.cloudinaryUrl,
+          contentType: doc.contentType || 'image/jpeg',
+          filename: doc.filename,
+        };
+      }
+
+      // If stored as binary buffer in MongoDB
+      if (doc.data && doc.data.length > 0) {
+        return {
+          data: doc.data,
+          contentType: doc.contentType || 'image/jpeg',
+          filename: doc.filename,
+        };
+      }
     }
   } catch (dbErr) {
     console.warn(`⚠️ DB lookup for image ${id} failed:`, dbErr.message);
   }
 
-  // Fallback to disk cache if DB query failed
+  // Fallback to disk cache if DB query failed or document had no buffer
   ensureUploadsDir();
   try {
     const files = fs.readdirSync(UPLOADS_DIR);
-    const match = files.find(f => f.startsWith(String(id)));
+    const match = files.find((f) => f.startsWith(String(id)));
     if (match) {
       const filePath = path.join(UPLOADS_DIR, match);
       const data = fs.readFileSync(filePath);
@@ -94,22 +149,30 @@ async function getImageById(id) {
 }
 
 /**
- * Delete an image by ID
+ * Delete an image by ID (from Cloudinary, MongoDB, and disk cache)
  * @param {string} id - Image ObjectId
  */
 async function deleteImageById(id) {
   try {
+    const doc = await Image.findById(id);
+    if (doc && doc.cloudinaryPublicId) {
+      await deleteFromCloudinary(doc.cloudinaryPublicId);
+    }
     await Image.findByIdAndDelete(id);
-  } catch (e) { /* ignore */ }
+  } catch (e) {
+    console.warn('⚠️ Error deleting image from DB:', e.message);
+  }
 
   try {
     ensureUploadsDir();
     const files = fs.readdirSync(UPLOADS_DIR);
-    const match = files.find(f => f.startsWith(String(id)));
+    const match = files.find((f) => f.startsWith(String(id)));
     if (match) {
       fs.unlinkSync(path.join(UPLOADS_DIR, match));
     }
-  } catch (e) { /* ignore */ }
+  } catch (e) {
+    /* ignore disk delete errors */
+  }
 }
 
 function getExtensionFromMime(mime) {
