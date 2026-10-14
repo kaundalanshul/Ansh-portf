@@ -365,7 +365,12 @@ function renderProjectsTable() {
     .map(
       (p) => `
       <tr>
-        <td><strong style="color:var(--text-primary)">${escapeHTML(p.title)}</strong></td>
+        <td>
+          <div style="display:flex;align-items:center;gap:10px;">
+            ${p.imageUrl ? `<img src="${resolveImageUrl(p.imageUrl)}" alt="${escapeHTML(p.title)}" style="width:40px;height:28px;object-fit:cover;border-radius:4px;border:1px solid var(--border-color,#333);background:#1a1a1a;" onerror="this.style.display='none';">` : ''}
+            <strong style="color:var(--text-primary)">${escapeHTML(p.title)}</strong>
+          </div>
+        </td>
         <td>
           ${p.liveUrl
             ? `<a href="${/^https?:\/\//i.test(p.liveUrl) ? p.liveUrl : 'https://' + p.liveUrl}" target="_blank" rel="noopener noreferrer" style="color:var(--accent-primary, #3b82f6); font-weight:600; text-decoration:none; font-size:0.82rem; display:inline-flex; align-items:center; gap:5px;" title="${escapeHTML(p.liveUrl)}">

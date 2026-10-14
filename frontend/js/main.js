@@ -188,7 +188,7 @@ function renderProjects(projects) {
 
       const imagePreviewHtml = hasImage
         ? `<div class="preview-image-wrapper" style="${defaultMode === 'image' ? 'display:block;' : 'display:none;'}">
-             <img src="${resolvedImgUrl}" class="project-image" alt="${escapeHtml(proj.title)}" style="margin: 0; border-radius: 0; width: 100%; aspect-ratio: 16/10; object-fit: contain; background: #111;" loading="lazy" onerror="this.onerror=null;this.parentElement.style.display='none';">
+             <img src="${resolvedImgUrl}" class="project-image" alt="${escapeHtml(proj.title)}" style="margin: 0; border-radius: 0; width: 100%; aspect-ratio: 16/10; object-fit: contain; background: #111;" loading="lazy" onerror="this.onerror=null;this.src='grocerystore.png';">
            </div>`
         : '';
 
@@ -239,8 +239,8 @@ function renderProjects(projects) {
       `;
     } else {
       previewHtml = hasImage
-        ? `<img src="${resolvedImgUrl}" class="project-image" alt="${escapeHtml(proj.title)}" style="margin-bottom: 1.5rem; width: 100%; aspect-ratio: 16/10; object-fit: cover; object-position: top center;" loading="lazy" onerror="this.onerror=null;this.src='';this.alt='Photo Not Found';">`
-        : `<div class="project-image" style="display:flex;align-items:center;justify-content:center;font-family:monospace;margin-bottom:1.5rem;">NO PHOTO</div>`;
+        ? `<img src="${resolvedImgUrl}" class="project-image" alt="${escapeHtml(proj.title)}" style="margin-bottom: 1.5rem; width: 100%; aspect-ratio: 16/10; object-fit: cover; object-position: top center;" loading="lazy" onerror="this.onerror=null;this.src='grocerystore.png';">`
+        : `<img src="grocerystore.png" class="project-image" alt="${escapeHtml(proj.title)}" style="margin-bottom: 1.5rem; width: 100%; aspect-ratio: 16/10; object-fit: cover; object-position: top center;" loading="lazy">`;
     }
 
     const liveLinkBelowPhoto = liveHref
