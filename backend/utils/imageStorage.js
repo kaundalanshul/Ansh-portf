@@ -100,8 +100,29 @@ async function saveImage({ filename, contentType, buffer }) {
  * @returns {Promise<Object|null>} { data, contentType, filename, redirectUrl }
  */
 async function getImageById(id) {
+  if (!id) return null;
+  const cleanId = String(id).trim();
+
   try {
-    const doc = await Image.findById(id);
+    const mongoose = require('mongoose');
+    let doc = null;
+
+    // 1. Try finding by ObjectId if valid
+    if (mongoose.Types.ObjectId.isValid(cleanId)) {
+      doc = await Image.findById(cleanId);
+    }
+
+    // 2. Fallback to finding by filename in MongoDB
+    if (!doc) {
+      const baseName = path.parse(cleanId).name;
+      doc = await Image.findOne({
+        $or: [
+          { filename: new RegExp('^' + escapeRegExp(cleanId) + '$', 'i') },
+          { filename: new RegExp('^' + escapeRegExp(baseName) + '(\\.[a-z0-9]+)?$', 'i') },
+        ],
+      });
+    }
+
     if (doc) {
       // If hosted on Cloudinary, return the secure CDN URL for redirect
       if (doc.cloudinaryUrl) {
@@ -129,7 +150,17 @@ async function getImageById(id) {
   ensureUploadsDir();
   try {
     const files = fs.readdirSync(UPLOADS_DIR);
-    const match = files.find((f) => f.startsWith(String(id)));
+    const baseName = path.parse(cleanId).name.toLowerCase();
+    const match = files.find((f) => {
+      const fBase = path.parse(f).name.toLowerCase();
+      const fFull = f.toLowerCase();
+      return (
+        fFull === cleanId.toLowerCase() ||
+        fBase === baseName ||
+        f.startsWith(cleanId)
+      );
+    });
+
     if (match) {
       const filePath = path.join(UPLOADS_DIR, match);
       const data = fs.readFileSync(filePath);
@@ -146,6 +177,10 @@ async function getImageById(id) {
   }
 
   return null;
+}
+
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 /**

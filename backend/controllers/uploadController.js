@@ -139,7 +139,7 @@ const getImage = async (req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Content-Type', image.contentType);
     res.setHeader('Content-Length', image.data.length);
-    res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
+    res.setHeader('Cache-Control', 'public, max-age=60, must-revalidate');
 
     return res.end(image.data);
   } catch (err) {

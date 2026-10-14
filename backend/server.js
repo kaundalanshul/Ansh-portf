@@ -71,8 +71,12 @@ app.use(express.json({ limit: '25mb' }));
 // Parse URL-encoded bodies
 app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 
-// Serve local uploads folder statically as fallback
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Serve local uploads folder statically as fallback with CORS enabled
+app.use('/uploads', (req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Cache-Control', 'public, max-age=60, must-revalidate');
+  next();
+}, express.static(path.join(__dirname, 'uploads')));
 
 /* ── API Routes ────────────────────────────────── */
 

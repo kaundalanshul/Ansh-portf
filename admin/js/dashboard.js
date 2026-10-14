@@ -367,7 +367,7 @@ function renderProjectsTable() {
       <tr>
         <td>
           <div style="display:flex;align-items:center;gap:10px;">
-            ${p.imageUrl ? `<img src="${resolveImageUrl(p.imageUrl)}" alt="${escapeHTML(p.title)}" style="width:40px;height:28px;object-fit:cover;border-radius:4px;border:1px solid var(--border-color,#333);background:#1a1a1a;" onerror="this.style.display='none';">` : ''}
+            ${p.imageUrl ? `<img src="${resolveImageUrl(p.imageUrl)}" alt="${escapeHTML(p.title)}" style="width:40px;height:28px;object-fit:cover;border-radius:4px;border:1px solid var(--border-color,#333);background:#1a1a1a;" onerror="this.onerror=null;this.src='grocerystore.png';">` : ''}
             <strong style="color:var(--text-primary)">${escapeHTML(p.title)}</strong>
           </div>
         </td>
@@ -462,6 +462,10 @@ function updatePhotoPreview() {
   const url = urlInput.value.trim();
   if (url) {
     previewImg.src = resolveImageUrl(url);
+    previewImg.onerror = function () {
+      this.onerror = null;
+      this.src = 'grocerystore.png';
+    };
     previewContainer.style.display = 'block';
   } else {
     previewImg.src = '';
