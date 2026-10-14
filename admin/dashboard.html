@@ -284,7 +284,8 @@
               <label for="siteProfileUpload">📷 Upload Profile Photo Directly</label>
               <input type="file" id="siteProfileUpload" accept="image/*" onchange="handleProfilePhotoUpload(event)">
               <div id="siteProfilePreviewContainer" style="display:none; margin-top:10px; text-align:center;">
-                <img id="siteProfilePreviewImg" src="" alt="Profile Preview" style="max-height:120px; border-radius:8px; border:1px solid var(--border-color);">
+                <img id="siteProfilePreviewImg" src="" alt="Profile Preview" style="max-height:140px; border-radius:8px; border:1px solid var(--border-color); display:block; margin:0 auto 6px;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="clearProfilePhoto()" style="margin:0 auto; display:inline-block;">✕ Remove Photo</button>
               </div>
             </div>
             <div class="form-group">
@@ -787,9 +788,10 @@
 
           <div class="form-group">
             <label for="interestCategoryImage">Image (Filename or URL)</label>
-            <input type="text" id="interestCategoryImage" placeholder="hobby_music.jpg or https://...">
+            <input type="text" id="interestCategoryImage" placeholder="hobby_music.jpg or https://..." oninput="updateInterestCategoryPhotoPreview()">
             <div id="interestCategoryImagePreview" style="display:none; margin-top:10px; text-align:center;">
-              <img id="interestCategoryPreviewImg" src="" alt="Preview" style="max-height:120px; border-radius:8px; border:1px solid var(--border-color);">
+              <img id="interestCategoryPreviewImg" src="" alt="Preview" style="max-height:120px; border-radius:8px; border:1px solid var(--border-color); display:block; margin:0 auto 6px;">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="clearInterestCategoryPhoto()" style="margin:0 auto; display:inline-block;">✕ Remove Photo</button>
             </div>
           </div>
 
@@ -853,7 +855,11 @@
 
           <div class="form-group">
             <label for="interestItemImage">Image (URL or filename, optional)</label>
-            <input type="text" id="interestItemImage" placeholder="https://images.unsplash.com/... or filename.jpg">
+            <input type="text" id="interestItemImage" placeholder="https://images.unsplash.com/... or filename.jpg" oninput="updateInterestItemPhotoPreview()">
+            <div id="interestItemImagePreview" style="display:none; margin-top:10px; text-align:center;">
+              <img id="interestItemPreviewImg" src="" alt="Item Preview" style="max-height:120px; border-radius:8px; border:1px solid var(--border-color); display:block; margin:0 auto 6px;">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="clearInterestItemPhoto()" style="margin:0 auto; display:inline-block;">✕ Remove Photo</button>
+            </div>
           </div>
 
           <div class="form-group">

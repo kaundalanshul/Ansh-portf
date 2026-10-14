@@ -15,6 +15,75 @@ let skills = [];
 let messages = [];
 let interestCategories = [];
 
+/**
+ * Resolves an image URL so relative backend paths (/api/images/..., /uploads/...)
+ * point to the active backend API host rather than admin static port.
+ */
+function resolveImageUrl(url) {
+  if (!url) return '';
+  url = String(url).trim();
+  if (!url) return '';
+  if (url.startsWith('data:')) return url;
+  if (/^https?:\/\//i.test(url)) return url;
+  const apiRoot = API_BASE.replace(/\/api\/?$/, '');
+  if (url.startsWith('/api/')) return `${apiRoot}${url}`;
+  if (url.startsWith('api/')) return `${apiRoot}/${url}`;
+  if (url.startsWith('uploads/') || url.startsWith('/uploads/')) {
+    const clean = url.startsWith('/') ? url : `/${url}`;
+    return `${apiRoot}${clean}`;
+  }
+  return url;
+}
+
+/**
+ * Upload a file (photo or PDF) to the persistent backend storage
+ * @param {File} file
+ * @returns {Promise<string|null>} Persistent URL (e.g. "/api/images/<id>") or null
+ */
+async function uploadFileToBackend(file) {
+  if (!file) return null;
+  const token = getToken();
+  if (!token) {
+    showToast('Please log in again to upload photos.', 'error');
+    return null;
+  }
+
+  // Convert to base64 data URL
+  const base64Data = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+
+  try {
+    const res = await fetch(`${API_BASE}/upload`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        image: base64Data,
+        filename: file.name,
+        contentType: file.type,
+      }),
+    });
+
+    const result = await res.json();
+    if (result && result.success && result.url) {
+      return result.url;
+    } else {
+      showToast(result?.message || 'Upload failed.', 'error');
+      return null;
+    }
+  } catch (err) {
+    console.error('File upload network error:', err);
+    showToast('Network error while uploading photo to backend.', 'error');
+    return null;
+  }
+}
+
 // Initialize dashboard on page load
 document.addEventListener('DOMContentLoaded', () => {
   // Auth guard — redirect if not logged in
@@ -339,23 +408,34 @@ function clearPhoto() {
   if (urlInput) urlInput.value = '';
   if (fileInput) fileInput.value = '';
   updatePhotoPreview();
+  showToast('Photo removed. Click "Save Project" to persist.');
 }
 
-/** Handle photo file upload via FileReader */
-function handlePhotoUpload(event) {
+/** Handle photo file upload via persistent backend upload */
+async function handlePhotoUpload(event) {
   const file = event.target.files && event.target.files[0];
   if (!file) return;
 
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    const dataUrl = e.target.result;
-    const urlInput = document.getElementById('projectImageUrl');
-    if (urlInput) {
-      urlInput.value = dataUrl;
-      updatePhotoPreview();
-    }
-  };
-  reader.readAsDataURL(file);
+  const urlInput = document.getElementById('projectImageUrl');
+  const previewContainer = document.getElementById('photoPreviewContainer');
+  const previewImg = document.getElementById('photoPreviewImg');
+
+  // Instant local visual preview
+  if (previewImg && previewContainer) {
+    previewImg.src = URL.createObjectURL(file);
+    previewContainer.style.display = 'block';
+  }
+
+  showToast('⏳ Uploading photo to database...', 'info');
+
+  const uploadedUrl = await uploadFileToBackend(file);
+  if (uploadedUrl) {
+    if (urlInput) urlInput.value = uploadedUrl;
+    updatePhotoPreview();
+    showToast('✅ Project photo uploaded! Click "Save Project" to persist.');
+  } else {
+    updatePhotoPreview();
+  }
 }
 
 /** Update photo preview thumbnail */
@@ -368,7 +448,7 @@ function updatePhotoPreview() {
 
   const url = urlInput.value.trim();
   if (url) {
-    previewImg.src = url;
+    previewImg.src = resolveImageUrl(url);
     previewContainer.style.display = 'block';
   } else {
     previewImg.src = '';
@@ -874,6 +954,16 @@ async function loadSiteProfileSettings() {
   }
 }
 
+/** Clear profile photo */
+function clearProfilePhoto() {
+  const input = document.getElementById('siteProfileImage');
+  const upload = document.getElementById('siteProfileUpload');
+  if (input) input.value = '';
+  if (upload) upload.value = '';
+  updateProfilePhotoPreview();
+  showToast('Profile photo cleared. Click "Save All Changes" to persist.');
+}
+
 /** Update profile photo live thumbnail */
 function updateProfilePhotoPreview() {
   const input = document.getElementById('siteProfileImage');
@@ -883,48 +973,59 @@ function updateProfilePhotoPreview() {
 
   const val = input.value.trim();
   if (val) {
-    img.src = val;
+    img.src = resolveImageUrl(val);
     container.style.display = 'block';
   } else {
+    img.src = '';
     container.style.display = 'none';
   }
 }
 
 /** Handle direct profile image upload */
-function handleProfilePhotoUpload(e) {
+async function handleProfilePhotoUpload(e) {
   const file = e.target.files && e.target.files[0];
   if (!file) return;
 
-  const reader = new FileReader();
-  reader.onload = function(evt) {
-    const dataUrl = evt.target.result;
-    const input = document.getElementById('siteProfileImage');
-    if (input) input.value = dataUrl;
+  const input = document.getElementById('siteProfileImage');
+  const container = document.getElementById('siteProfilePreviewContainer');
+  const img = document.getElementById('siteProfilePreviewImg');
+
+  // Instant local visual preview
+  if (img && container) {
+    img.src = URL.createObjectURL(file);
+    container.style.display = 'block';
+  }
+
+  showToast('⏳ Uploading profile photo to database...', 'info');
+
+  const uploadedUrl = await uploadFileToBackend(file);
+  if (uploadedUrl) {
+    if (input) input.value = uploadedUrl;
     updateProfilePhotoPreview();
-    showToast('Profile photo loaded! Click "Save All Changes" to persist.');
-  };
-  reader.readAsDataURL(file);
+    showToast('✅ Profile photo uploaded! Click "Save All Changes" to persist.');
+  } else {
+    updateProfilePhotoPreview();
+  }
 }
 
 /** Test current resume link */
 function testResumeLink() {
   const url = document.getElementById('siteResumeUrl').value.trim() || 'resume.pdf';
-  window.open(url, '_blank');
+  window.open(resolveImageUrl(url), '_blank');
 }
 
 /** Handle direct resume upload */
-function handleResumeUpload(e) {
+async function handleResumeUpload(e) {
   const file = e.target.files && e.target.files[0];
   if (!file) return;
 
-  const reader = new FileReader();
-  reader.onload = function(evt) {
-    const dataUrl = evt.target.result;
+  showToast('⏳ Uploading resume PDF...', 'info');
+  const uploadedUrl = await uploadFileToBackend(file);
+  if (uploadedUrl) {
     const input = document.getElementById('siteResumeUrl');
-    if (input) input.value = dataUrl;
-    showToast('Resume PDF loaded! Click "Save All Changes" to persist.');
-  };
-  reader.readAsDataURL(file);
+    if (input) input.value = uploadedUrl;
+    showToast('✅ Resume PDF uploaded! Click "Save All Changes" to persist.');
+  }
 }
 
 /* ── Social Media Links Admin ──────────────────── */
@@ -1854,7 +1955,7 @@ function editInterestCategory(catId) {
   const previewDiv = document.getElementById('interestCategoryImagePreview');
   const previewImg = document.getElementById('interestCategoryPreviewImg');
   if (cat.image && previewDiv && previewImg) {
-    previewImg.src = cat.image;
+    previewImg.src = resolveImageUrl(cat.image);
     previewDiv.style.display = 'block';
   } else if (previewDiv) {
     previewDiv.style.display = 'none';
@@ -1911,22 +2012,56 @@ function deleteInterestCategory(catId) {
   });
 }
 
-/** Handle image upload for interest category — converts to base64 data URL */
-function handleInterestCategoryImageUpload(event) {
+/** Clear interest category photo */
+function clearInterestCategoryPhoto() {
+  const input = document.getElementById('interestCategoryImage');
+  const upload = document.getElementById('interestCategoryUpload');
+  if (input) input.value = '';
+  if (upload) upload.value = '';
+  updateInterestCategoryPhotoPreview();
+  showToast('Photo removed. Click "Save Interest" to persist.');
+}
+
+/** Update interest category preview */
+function updateInterestCategoryPhotoPreview() {
+  const input = document.getElementById('interestCategoryImage');
+  const previewDiv = document.getElementById('interestCategoryImagePreview');
+  const previewImg = document.getElementById('interestCategoryPreviewImg');
+  if (!input || !previewDiv || !previewImg) return;
+
+  const val = input.value.trim();
+  if (val) {
+    previewImg.src = resolveImageUrl(val);
+    previewDiv.style.display = 'block';
+  } else {
+    previewImg.src = '';
+    previewDiv.style.display = 'none';
+  }
+}
+
+/** Handle image upload for interest category */
+async function handleInterestCategoryImageUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const dataUrl = e.target.result;
-    document.getElementById('interestCategoryImage').value = dataUrl;
-    const previewDiv = document.getElementById('interestCategoryImagePreview');
-    const previewImg = document.getElementById('interestCategoryPreviewImg');
-    if (previewDiv && previewImg) {
-      previewImg.src = dataUrl;
-      previewDiv.style.display = 'block';
-    }
-  };
-  reader.readAsDataURL(file);
+
+  const input = document.getElementById('interestCategoryImage');
+  const previewDiv = document.getElementById('interestCategoryImagePreview');
+  const previewImg = document.getElementById('interestCategoryPreviewImg');
+
+  if (previewImg && previewDiv) {
+    previewImg.src = URL.createObjectURL(file);
+    previewDiv.style.display = 'block';
+  }
+
+  showToast('⏳ Uploading category image...', 'info');
+  const uploadedUrl = await uploadFileToBackend(file);
+  if (uploadedUrl) {
+    if (input) input.value = uploadedUrl;
+    updateInterestCategoryPhotoPreview();
+    showToast('✅ Category image uploaded! Click "Save Interest" to persist.');
+  } else {
+    updateInterestCategoryPhotoPreview();
+  }
 }
 
 /* ── Interest Item CRUD ──────────────────────────── */
@@ -1945,6 +2080,7 @@ function openInterestItemModal(categoryId) {
   document.getElementById('interestItemOrder').value = 0;
   const upload = document.getElementById('interestItemUpload');
   if (upload) upload.value = '';
+  updateInterestItemPhotoPreview();
   openModal('interestItemModal');
 }
 
@@ -1967,6 +2103,7 @@ function editInterestItem(categoryId, itemId) {
   document.getElementById('interestItemOrder').value = item.order || 0;
   const upload = document.getElementById('interestItemUpload');
   if (upload) upload.value = '';
+  updateInterestItemPhotoPreview();
   openModal('interestItemModal');
 }
 
@@ -2025,15 +2162,56 @@ function deleteInterestItem(categoryId, itemId) {
   });
 }
 
+/** Clear interest item photo */
+function clearInterestItemPhoto() {
+  const input = document.getElementById('interestItemImage');
+  const upload = document.getElementById('interestItemUpload');
+  if (input) input.value = '';
+  if (upload) upload.value = '';
+  updateInterestItemPhotoPreview();
+  showToast('Photo removed. Click "Save Item" to persist.');
+}
+
+/** Update interest item preview */
+function updateInterestItemPhotoPreview() {
+  const input = document.getElementById('interestItemImage');
+  const previewDiv = document.getElementById('interestItemImagePreview');
+  const previewImg = document.getElementById('interestItemPreviewImg');
+  if (!input || !previewDiv || !previewImg) return;
+
+  const val = input.value.trim();
+  if (val) {
+    previewImg.src = resolveImageUrl(val);
+    previewDiv.style.display = 'block';
+  } else {
+    previewImg.src = '';
+    previewDiv.style.display = 'none';
+  }
+}
+
 /** Handle image upload for interest item */
-function handleInterestItemImageUpload(event) {
+async function handleInterestItemImageUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    document.getElementById('interestItemImage').value = e.target.result;
-  };
-  reader.readAsDataURL(file);
+
+  const input = document.getElementById('interestItemImage');
+  const previewDiv = document.getElementById('interestItemImagePreview');
+  const previewImg = document.getElementById('interestItemPreviewImg');
+
+  if (previewImg && previewDiv) {
+    previewImg.src = URL.createObjectURL(file);
+    previewDiv.style.display = 'block';
+  }
+
+  showToast('⏳ Uploading item image...', 'info');
+  const uploadedUrl = await uploadFileToBackend(file);
+  if (uploadedUrl) {
+    if (input) input.value = uploadedUrl;
+    updateInterestItemPhotoPreview();
+    showToast('✅ Item image uploaded! Click "Save Item" to persist.');
+  } else {
+    updateInterestItemPhotoPreview();
+  }
 }
 
 /* ══════════════════════════════════════════════════

@@ -12,13 +12,13 @@
       "CSS3",
       "Render"
     ],
-    "imageUrl": "",
-    "liveUrl": "https://grocerystore-3zcf.onrender.com/",
+    "imageUrl": "/api/images/6acf211e33fc90828bc11868",
+    "liveUrl": "",
     "githubUrl": "https://github.com/kaundalanshul/grocery.store",
     "featured": true,
     "order": 0,
     "createdAt": "2026-09-16T16:13:47.457Z",
-    "updatedAt": "2026-09-16T16:13:47.457Z",
+    "updatedAt": "2026-10-14T06:28:47.419Z",
     "__v": 0
   }
 ]

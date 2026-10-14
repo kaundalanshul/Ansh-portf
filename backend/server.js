@@ -26,6 +26,7 @@ const skillRoutes = require('./routes/skillRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const interestRoutes = require('./routes/interestRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
 
 // Initialize Express app
 const app = express();
@@ -64,14 +65,18 @@ app.use(cors({
   credentials: true,
 }));
 
-// Parse JSON request bodies
-app.use(express.json({ limit: '10mb' }));
+// Parse JSON request bodies (up to 25mb for high-res images)
+app.use(express.json({ limit: '25mb' }));
 
 // Parse URL-encoded bodies
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '25mb' }));
+
+// Serve local uploads folder statically as fallback
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 /* ── API Routes ────────────────────────────────── */
 
+app.use('/api', uploadRoutes); // Mounts /api/upload and /api/images/:id
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/skills', skillRoutes);

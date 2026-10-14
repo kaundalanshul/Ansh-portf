@@ -10,6 +10,26 @@ function getApiBase() {
 }
 const API_BASE = getApiBase();
 
+/**
+ * Resolves an image URL so relative backend paths (/api/images/..., /uploads/...)
+ * point to the active backend API host rather than frontend static port.
+ */
+function resolveImageUrl(url) {
+  if (!url) return '';
+  url = String(url).trim();
+  if (!url) return '';
+  if (url.startsWith('data:')) return url;
+  if (/^https?:\/\//i.test(url)) return url;
+  const apiRoot = API_BASE.replace(/\/api\/?$/, '');
+  if (url.startsWith('/api/')) return `${apiRoot}${url}`;
+  if (url.startsWith('api/')) return `${apiRoot}/${url}`;
+  if (url.startsWith('uploads/') || url.startsWith('/uploads/')) {
+    const clean = url.startsWith('/') ? url : `/${url}`;
+    return `${apiRoot}${clean}`;
+  }
+  return url;
+}
+
 // Configurable Resume Path — easily modified to point to any PDF file or URL
 const DEFAULT_RESUME_URL = 'resume.pdf';
 window.PORTFOLIO_CONFIG = Object.assign({
@@ -142,20 +162,25 @@ function renderProjects(projects) {
       ? (/^https?:\/\//i.test(proj.liveUrl) ? proj.liveUrl : 'https://' + proj.liveUrl)
       : '';
 
-    // If project has liveUrl, render live interactive preview frame; otherwise render image
+    const resolvedImgUrl = resolveImageUrl(proj.imageUrl);
+    const hasImage = !!resolvedImgUrl;
+
+    // If project has liveUrl, render live container with photo and interactive preview toggles
     let previewHtml = '';
     if (liveHref) {
-      const hasImage = !!proj.imageUrl;
+      // If photo was uploaded, default to showing photo!
+      const defaultMode = hasImage ? 'image' : 'live';
+
       const modeToggleHtml = hasImage
         ? `<div class="mode-toggle">
-            <button type="button" class="mode-btn active" data-mode="live" onclick="togglePreviewMode('${proj._id}', 'live')" title="Interactive Live Preview">Live</button>
-            <button type="button" class="mode-btn" data-mode="image" onclick="togglePreviewMode('${proj._id}', 'image')" title="Static Screenshot">Photo</button>
+            <button type="button" class="mode-btn ${defaultMode === 'image' ? 'active' : ''}" data-mode="image" onclick="togglePreviewMode('${proj._id}', 'image')" title="Project Screenshot">📸 Photo</button>
+            <button type="button" class="mode-btn ${defaultMode === 'live' ? 'active' : ''}" data-mode="live" onclick="togglePreviewMode('${proj._id}', 'live')" title="Interactive Live Preview">🖥️ Live Preview</button>
            </div>`
         : '';
 
       const imagePreviewHtml = hasImage
-        ? `<div class="preview-image-wrapper" style="display:none;">
-             <img src="${proj.imageUrl}" class="project-image" alt="${proj.title}" style="margin: 0; border-radius: 0; aspect-ratio: 16/10; object-fit: cover;">
+        ? `<div class="preview-image-wrapper" style="${defaultMode === 'image' ? 'display:block;' : 'display:none;'}">
+             <img src="${resolvedImgUrl}" class="project-image" alt="${escapeHtml(proj.title)}" style="margin: 0; border-radius: 0; width: 100%; aspect-ratio: 16/10; object-fit: contain; background: #111;" loading="lazy" onerror="this.onerror=null;this.parentElement.style.display='none';">
            </div>`
         : '';
 
@@ -182,13 +207,13 @@ function renderProjects(projects) {
               </a>
             </div>
           </div>
-          <div class="preview-viewport-wrapper">
+          <div class="preview-viewport-wrapper" style="${defaultMode === 'image' ? 'display:none;' : 'display:block;'}">
             <div class="preview-device-screen desktop" id="screen-${proj._id}">
               <iframe
                 src="${liveHref}"
                 class="preview-iframe"
                 id="iframe-${proj._id}"
-                title="${proj.title} Live Preview"
+                title="${escapeHtml(proj.title)} Live Preview"
                 loading="lazy"
                 sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -197,7 +222,7 @@ function renderProjects(projects) {
           </div>
           ${imagePreviewHtml}
           <div class="preview-footer">
-            <span class="preview-status"><span class="pulse-dot"></span> Live Interactive Preview</span>
+            <span class="preview-status"><span class="pulse-dot"></span> ${hasImage && defaultMode === 'image' ? 'Project Screenshot' : 'Live Interactive Preview'}</span>
             <a href="${liveHref}" target="_blank" rel="noopener noreferrer" class="btn-open-live-full">
               Open Live Site [ ↗ ]
             </a>
@@ -205,8 +230,8 @@ function renderProjects(projects) {
         </div>
       `;
     } else {
-      previewHtml = proj.imageUrl
-        ? `<img src="${proj.imageUrl}" class="project-image" alt="${proj.title}" style="margin-bottom: 1.5rem;" onerror="this.onerror=null;this.src='';this.alt='Photo Not Found';">`
+      previewHtml = hasImage
+        ? `<img src="${resolvedImgUrl}" class="project-image" alt="${escapeHtml(proj.title)}" style="margin-bottom: 1.5rem; width: 100%; aspect-ratio: 16/10; object-fit: cover; object-position: top center;" loading="lazy" onerror="this.onerror=null;this.src='';this.alt='Photo Not Found';">`
         : `<div class="project-image" style="display:flex;align-items:center;justify-content:center;font-family:monospace;margin-bottom:1.5rem;">NO PHOTO</div>`;
     }
 
@@ -435,9 +460,14 @@ function applyProfileData(p) {
   }
 
   const aboutImgEl = document.getElementById('aboutImage');
-  if (aboutImgEl && p.profileImage) {
-    aboutImgEl.src = p.profileImage;
-    if (p.name) aboutImgEl.alt = p.name;
+  if (aboutImgEl) {
+    const pfpSrc = resolveImageUrl(p?.profileImage) || 'me_pfp.jpg';
+    aboutImgEl.src = pfpSrc;
+    if (p?.name) aboutImgEl.alt = p.name;
+    aboutImgEl.onerror = function () {
+      this.onerror = null;
+      this.src = 'me_pfp.jpg';
+    };
   }
 
   // Re-initialize text reveal for dynamic about text
@@ -728,7 +758,7 @@ window.closeResumeModal = function() {
 
 /** Synchronize resume links across buttons and modal */
 function updateResumeLinks() {
-  const resumeUrl = window.PORTFOLIO_CONFIG?.resumeUrl || DEFAULT_RESUME_URL;
+  const resumeUrl = resolveImageUrl(window.PORTFOLIO_CONFIG?.resumeUrl || DEFAULT_RESUME_URL);
 
   const downloadBtn = document.getElementById('modalResumeDownloadBtn');
   if (downloadBtn) downloadBtn.href = resumeUrl;
@@ -933,12 +963,12 @@ function renderFrontendInterests(interests) {
     const num = item.num || (i < 9 ? `0${i + 1}` : `${i + 1}`);
     const itemCount = Array.isArray(item.items) ? item.items.length : 0;
     const countText = itemCount === 1 ? '1 ITEM' : `${itemCount} ITEMS`;
-    const imageSrc = item.image || 'hobby_music.jpg';
+    const imageSrc = resolveImageUrl(item.image) || 'hobby_music.jpg';
 
     return `
       <div class="hobby-card" onclick="openInterestDetail('${item._id || item.title}')" role="button" tabindex="0" aria-label="View ${escapeHtml(item.title)} details">
         <div class="hobby-image-wrapper">
-          <img src="${imageSrc}" alt="${escapeHtml(item.title)}" class="hobby-image" loading="lazy">
+          <img src="${imageSrc}" alt="${escapeHtml(item.title)}" class="hobby-image" loading="lazy" onerror="this.onerror=null;this.src='hobby_music.jpg';">
           <span class="hobby-hover-prompt">[ EXPLORE → ]</span>
         </div>
         <div class="hobby-info">
@@ -971,7 +1001,7 @@ window.openInterestDetail = function (idOrTitle) {
   const num = interest.num || '01';
   const title = interest.title || 'INTEREST';
   const desc = interest.description || 'Explore curated items, recommendations, and creative inspirations.';
-  const image = interest.image || 'hobby_music.jpg';
+  const image = resolveImageUrl(interest.image) || 'hobby_music.jpg';
   const items = Array.isArray(interest.items) ? interest.items : [];
 
   // Populate hero banner
@@ -988,6 +1018,10 @@ window.openInterestDetail = function (idOrTitle) {
   if (imgEl) {
     imgEl.src = image;
     imgEl.alt = title;
+    imgEl.onerror = function() {
+      this.onerror = null;
+      this.src = 'hobby_music.jpg';
+    };
   }
   if (countEl) countEl.textContent = `${items.length} ${items.length === 1 ? 'ITEM' : 'ITEMS'}`;
   if (breadcrumbEl) breadcrumbEl.textContent = `INTEREST / ${num} — ${title}`;
@@ -1049,8 +1083,9 @@ window.openInterestDetail = function (idOrTitle) {
     } else {
       itemsGrid.innerHTML = items.map((item, idx) => {
         const itemTag = item.tag ? `<span class="interest-item-tag-badge">${escapeHtml(item.tag)}</span>` : '';
-        const itemMedia = item.image
-          ? `<img src="${item.image}" alt="${escapeHtml(item.title || 'Item')}" class="interest-item-img" loading="lazy">`
+        const itemImgSrc = item.image ? resolveImageUrl(item.image) : '';
+        const itemMedia = itemImgSrc
+          ? `<img src="${itemImgSrc}" alt="${escapeHtml(item.title || 'Item')}" class="interest-item-img" loading="lazy" onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\\'interest-item-placeholder\\'>#${idx + 1}</div>';">`
           : `<div class="interest-item-placeholder">#${idx + 1}</div>`;
         const linkBtn = item.link
           ? `<div class="interest-item-action">
@@ -1198,17 +1233,20 @@ window.togglePreviewMode = function (projId, mode) {
   const imageView = container.querySelector('.preview-image-wrapper');
   const liveBtn = container.querySelector('.mode-btn[data-mode="live"]');
   const imgBtn = container.querySelector('.mode-btn[data-mode="image"]');
+  const statusText = container.querySelector('.preview-status');
 
   if (mode === 'image' && imageView) {
-    liveView.style.display = 'none';
+    if (liveView) liveView.style.display = 'none';
     imageView.style.display = 'block';
     liveBtn?.classList.remove('active');
     imgBtn?.classList.add('active');
+    if (statusText) statusText.innerHTML = '<span class="pulse-dot"></span> Project Screenshot';
   } else {
     if (imageView) imageView.style.display = 'none';
-    liveView.style.display = 'flex';
+    if (liveView) liveView.style.display = 'block';
     imgBtn?.classList.remove('active');
     liveBtn?.classList.add('active');
+    if (statusText) statusText.innerHTML = '<span class="pulse-dot"></span> Live Interactive Preview';
   }
 };
 
