@@ -114,11 +114,11 @@ const profileSchema = new mongoose.Schema(
     },
     contactPhone: {
       type: String,
-      default: '+91 98765 43210',
+      default: '+91 8988439700',
     },
     contactLocation: {
       type: String,
-      default: 'India',
+      default: 'Nadaun, Hamirpur, Himachal Pradesh, India',
     },
     resumeUrl: {
       type: String,
@@ -126,14 +126,14 @@ const profileSchema = new mongoose.Schema(
     },
     marqueeText: {
       type: String,
-      default: 'ANSHUL KAUNDAL PORTFOLIO © 2026 ◆ FULL STACK DEVELOPER ◆ AVAILABLE FOR WORK',
+      default: 'ANSHUL KAUNDAL PORTFOLIO © 2027 ◆ MERN STACK DEVELOPER ◆ AVAILABLE FOR WORK',
     },
     socialLinks: {
       type: [socialLinkSchema],
       default: [
         { platform: 'github', label: 'GitHub', url: 'https://github.com/kaundalanshul', order: 1 },
-        { platform: 'linkedin', label: 'LinkedIn', url: 'https://linkedin.com/in/anshul-kaundal', order: 2 },
-        { platform: 'twitter', label: 'Twitter / X', url: 'https://twitter.com', order: 3 },
+        { platform: 'linkedin', label: 'LinkedIn', url: 'https://linkedin.com/in/anshul-kaundal-18877a328', order: 2 },
+        { platform: 'instagram', label: 'Instagram', url: 'https://www.instagram.com/_aansh01__/', order: 3 },
         { platform: 'email', label: 'Email', url: 'mailto:kaundalanshul725@gmail.com', order: 4 },
       ],
     },
@@ -141,11 +141,11 @@ const profileSchema = new mongoose.Schema(
       type: [educationSchema],
       default: [
         {
-          degree: 'Bachelor of Technology in Computer Science & Engineering',
-          institution: 'APG Shimla University',
-          year: '2022 — 2026',
-          grade: 'CGPA: 8.5/10',
-          description: 'Core coursework in Data Structures, Algorithms, Object-Oriented Programming, Database Management Systems, and Full Stack Web Engineering.',
+          degree: 'B.Tech in Computer Science & Engineering',
+          institution: 'Himachal Pradesh Technical University (HPTU)',
+          year: '2023 – Present (Expected 2027)',
+          grade: 'Pursuing',
+          description: 'Core coursework in Data Structures, Algorithms, Object-Oriented Programming, Database Management Systems, and MERN Stack Engineering.',
           order: 1,
         },
       ],

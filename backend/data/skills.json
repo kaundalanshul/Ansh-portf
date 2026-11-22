@@ -1,92 +1,312 @@
 [
   {
-    "_id": "6acdef3557c18c2da0d785a2",
+    "_id": "6b02d3ee2c6ff3320ed9c9b3",
     "name": "Node.js",
     "category": "Backend",
-    "proficiency": 90,
+    "proficiency": 92,
     "icon": "🟢",
-    "order": 6,
-    "createdAt": "2026-10-13T08:43:33.973Z",
-    "updatedAt": "2026-10-13T08:43:33.973Z"
+    "order": 1,
+    "createdAt": "2026-11-22T11:37:18.878Z",
+    "updatedAt": "2026-11-22T11:37:18.878Z"
   },
   {
-    "_id": "6acdef3657c18c2da0d785a4",
+    "_id": "6b02d3ee2c6ff3320ed9c9b4",
     "name": "Express.js",
     "category": "Backend",
-    "proficiency": 90,
+    "proficiency": 92,
     "icon": "🚂",
-    "order": 7,
-    "createdAt": "2026-10-13T08:43:34.235Z",
-    "updatedAt": "2026-10-13T08:43:34.235Z"
+    "order": 2,
+    "createdAt": "2026-11-22T11:37:18.878Z",
+    "updatedAt": "2026-11-22T11:37:18.878Z"
   },
   {
-    "_id": "6acdef3657c18c2da0d785a6",
+    "_id": "6b02d3ee2c6ff3320ed9c9b5",
     "name": "RESTful APIs",
     "category": "Backend",
-    "proficiency": 92,
+    "proficiency": 95,
     "icon": "🔌",
-    "order": 8,
-    "createdAt": "2026-10-13T08:43:34.609Z",
-    "updatedAt": "2026-10-13T08:43:34.609Z"
+    "order": 3,
+    "createdAt": "2026-11-22T11:37:18.878Z",
+    "updatedAt": "2026-11-22T11:37:18.878Z"
   },
   {
-    "_id": "6acdef3657c18c2da0d785a8",
-    "name": "JWT Authentication",
+    "_id": "6b02d3ee2c6ff3320ed9c9b6",
+    "name": "JWT & bcryptjs Authentication",
+    "category": "Backend",
+    "proficiency": 90,
+    "icon": "🔐",
+    "order": 4,
+    "createdAt": "2026-11-22T11:37:18.878Z",
+    "updatedAt": "2026-11-22T11:37:18.878Z"
+  },
+  {
+    "_id": "6b02d3ee2c6ff3320ed9c9b7",
+    "name": "Google Gemini API",
+    "category": "Backend",
+    "proficiency": 88,
+    "icon": "🤖",
+    "order": 5,
+    "createdAt": "2026-11-22T11:37:18.878Z",
+    "updatedAt": "2026-11-22T11:37:18.878Z"
+  },
+  {
+    "_id": "6b02d3ee2c6ff3320ed9c9b8",
+    "name": "Stripe Payment Integration",
     "category": "Backend",
     "proficiency": 85,
-    "icon": "🔐",
-    "order": 9,
-    "createdAt": "2026-10-13T08:43:34.751Z",
-    "updatedAt": "2026-10-13T08:43:34.751Z"
+    "icon": "💳",
+    "order": 6,
+    "createdAt": "2026-11-22T11:37:18.878Z",
+    "updatedAt": "2026-11-22T11:37:18.878Z"
   },
   {
-    "_id": "6acdef3357c18c2da0d78598",
-    "name": "React.js",
+    "_id": "6b02d3ee2c6ff3320ed9c9b9",
+    "name": "Web Scraping (Cheerio)",
+    "category": "Backend",
+    "proficiency": 88,
+    "icon": "🕷️",
+    "order": 7,
+    "createdAt": "2026-11-22T11:37:18.878Z",
+    "updatedAt": "2026-11-22T11:37:18.878Z"
+  },
+  {
+    "_id": "6b02d3ee2c6ff3320ed9c9ba",
+    "name": "Multer & Cloudinary",
+    "category": "Backend",
+    "proficiency": 86,
+    "icon": "☁️",
+    "order": 8,
+    "createdAt": "2026-11-22T11:37:18.878Z",
+    "updatedAt": "2026-11-22T11:37:18.878Z"
+  },
+  {
+    "_id": "6b02d3ee2c6ff3320ed9c9bb",
+    "name": "Cron Scheduling",
+    "category": "Backend",
+    "proficiency": 85,
+    "icon": "⏱️",
+    "order": 9,
+    "createdAt": "2026-11-22T11:37:18.878Z",
+    "updatedAt": "2026-11-22T11:37:18.878Z"
+  },
+  {
+    "_id": "6b02d3ee2c6ff3320ed9c9ab",
+    "name": "React.js (React 18)",
     "category": "Frontend",
-    "proficiency": 92,
+    "proficiency": 94,
     "icon": "⚛️",
     "order": 1,
-    "createdAt": "2026-10-13T08:43:31.262Z",
-    "updatedAt": "2026-10-13T08:43:31.262Z"
+    "createdAt": "2026-11-22T11:37:18.877Z",
+    "updatedAt": "2026-11-22T11:37:18.877Z"
   },
   {
-    "_id": "6acdef3457c18c2da0d7859a",
-    "name": "JavaScript (ES6+)",
+    "_id": "6b02d3ee2c6ff3320ed9c9ac",
+    "name": "Vite",
     "category": "Frontend",
-    "proficiency": 95,
+    "proficiency": 90,
     "icon": "⚡",
     "order": 2,
-    "createdAt": "2026-10-13T08:43:32.247Z",
-    "updatedAt": "2026-10-13T08:43:32.247Z"
+    "createdAt": "2026-11-22T11:37:18.878Z",
+    "updatedAt": "2026-11-22T11:37:18.878Z"
   },
   {
-    "_id": "6acdef3457c18c2da0d7859c",
+    "_id": "6b02d3ee2c6ff3320ed9c9ad",
+    "name": "Tailwind CSS",
+    "category": "Frontend",
+    "proficiency": 92,
+    "icon": "💨",
+    "order": 3,
+    "createdAt": "2026-11-22T11:37:18.878Z",
+    "updatedAt": "2026-11-22T11:37:18.878Z"
+  },
+  {
+    "_id": "6b02d3ee2c6ff3320ed9c9ae",
     "name": "HTML5 & CSS3",
     "category": "Frontend",
     "proficiency": 95,
     "icon": "🎨",
-    "order": 3,
-    "createdAt": "2026-10-13T08:43:32.511Z",
-    "updatedAt": "2026-10-13T08:43:32.511Z"
+    "order": 4,
+    "createdAt": "2026-11-22T11:37:18.878Z",
+    "updatedAt": "2026-11-22T11:37:18.878Z"
   },
   {
-    "_id": "6acdef3457c18c2da0d7859e",
-    "name": "Tailwind CSS",
+    "_id": "6b02d3ee2c6ff3320ed9c9af",
+    "name": "Responsive Web Design",
+    "category": "Frontend",
+    "proficiency": 94,
+    "icon": "📱",
+    "order": 5,
+    "createdAt": "2026-11-22T11:37:18.878Z",
+    "updatedAt": "2026-11-22T11:37:18.878Z"
+  },
+  {
+    "_id": "6b02d3ee2c6ff3320ed9c9b0",
+    "name": "Redux & Context API",
     "category": "Frontend",
     "proficiency": 88,
-    "icon": "💨",
-    "order": 4,
-    "createdAt": "2026-10-13T08:43:32.957Z",
-    "updatedAt": "2026-10-13T08:43:32.957Z"
+    "icon": "🔄",
+    "order": 6,
+    "createdAt": "2026-11-22T11:37:18.878Z",
+    "updatedAt": "2026-11-22T11:37:18.878Z"
   },
   {
-    "_id": "6acdef3557c18c2da0d785a0",
-    "name": "Three.js",
+    "_id": "6b02d3ee2c6ff3320ed9c9b1",
+    "name": "Web Speech API (STT & TTS)",
     "category": "Frontend",
-    "proficiency": 80,
+    "proficiency": 86,
+    "icon": "🎙️",
+    "order": 7,
+    "createdAt": "2026-11-22T11:37:18.878Z",
+    "updatedAt": "2026-11-22T11:37:18.878Z"
+  },
+  {
+    "_id": "6b02d3ee2c6ff3320ed9c9b2",
+    "name": "Axios",
+    "category": "Frontend",
+    "proficiency": 92,
     "icon": "🌐",
+    "order": 8,
+    "createdAt": "2026-11-22T11:37:18.878Z",
+    "updatedAt": "2026-11-22T11:37:18.878Z"
+  },
+  {
+    "_id": "6b02d3ee2c6ff3320ed9c9c1",
+    "name": "JavaScript (ES6+)",
+    "category": "Other",
+    "proficiency": 95,
+    "icon": "⚡",
+    "order": 1,
+    "createdAt": "2026-11-22T11:37:18.879Z",
+    "updatedAt": "2026-11-22T11:37:18.879Z"
+  },
+  {
+    "_id": "6b02d3ee2c6ff3320ed9c9c2",
+    "name": "Python",
+    "category": "Other",
+    "proficiency": 90,
+    "icon": "🐍",
+    "order": 2,
+    "createdAt": "2026-11-22T11:37:18.879Z",
+    "updatedAt": "2026-11-22T11:37:18.879Z"
+  },
+  {
+    "_id": "6b02d3ee2c6ff3320ed9c9c3",
+    "name": "C++ & C",
+    "category": "Other",
+    "proficiency": 82,
+    "icon": "⚙️",
+    "order": 3,
+    "createdAt": "2026-11-22T11:37:18.879Z",
+    "updatedAt": "2026-11-22T11:37:18.879Z"
+  },
+  {
+    "_id": "6b02d3ee2c6ff3320ed9c9c4",
+    "name": "MongoDB (MongoDB Atlas)",
+    "category": "Other",
+    "proficiency": 94,
+    "icon": "🍃",
+    "order": 4,
+    "createdAt": "2026-11-22T11:37:18.879Z",
+    "updatedAt": "2026-11-22T11:37:18.879Z"
+  },
+  {
+    "_id": "6b02d3ee2c6ff3320ed9c9c5",
+    "name": "Mongoose",
+    "category": "Other",
+    "proficiency": 92,
+    "icon": "🦫",
     "order": 5,
-    "createdAt": "2026-10-13T08:43:33.304Z",
-    "updatedAt": "2026-10-13T08:43:33.304Z"
+    "createdAt": "2026-11-22T11:37:18.879Z",
+    "updatedAt": "2026-11-22T11:37:18.879Z"
+  },
+  {
+    "_id": "6b02d3ee2c6ff3320ed9c9c6",
+    "name": "PostgreSQL & MySQL",
+    "category": "Other",
+    "proficiency": 85,
+    "icon": "🐘",
+    "order": 6,
+    "createdAt": "2026-11-22T11:37:18.879Z",
+    "updatedAt": "2026-11-22T11:37:18.879Z"
+  },
+  {
+    "_id": "6b02d3ee2c6ff3320ed9c9c7",
+    "name": "SQLite & Sequelize ORM",
+    "category": "Other",
+    "proficiency": 84,
+    "icon": "🗄️",
+    "order": 7,
+    "createdAt": "2026-11-22T11:37:18.879Z",
+    "updatedAt": "2026-11-22T11:37:18.879Z"
+  },
+  {
+    "_id": "6b02d3ee2c6ff3320ed9c9c8",
+    "name": "Scikit-learn, Pandas, NumPy",
+    "category": "Other",
+    "proficiency": 80,
+    "icon": "📊",
+    "order": 8,
+    "createdAt": "2026-11-22T11:37:18.879Z",
+    "updatedAt": "2026-11-22T11:37:18.879Z"
+  },
+  {
+    "_id": "6b02d3ee2c6ff3320ed9c9c9",
+    "name": "Google Cloud (Basic)",
+    "category": "Other",
+    "proficiency": 78,
+    "icon": "☁️",
+    "order": 9,
+    "createdAt": "2026-11-22T11:37:18.879Z",
+    "updatedAt": "2026-11-22T11:37:18.879Z"
+  },
+  {
+    "_id": "6b02d3ee2c6ff3320ed9c9bc",
+    "name": "Git & GitHub",
+    "category": "Tools",
+    "proficiency": 92,
+    "icon": "🐙",
+    "order": 1,
+    "createdAt": "2026-11-22T11:37:18.878Z",
+    "updatedAt": "2026-11-22T11:37:18.878Z"
+  },
+  {
+    "_id": "6b02d3ee2c6ff3320ed9c9bd",
+    "name": "Render",
+    "category": "Tools",
+    "proficiency": 90,
+    "icon": "🚀",
+    "order": 2,
+    "createdAt": "2026-11-22T11:37:18.879Z",
+    "updatedAt": "2026-11-22T11:37:18.879Z"
+  },
+  {
+    "_id": "6b02d3ee2c6ff3320ed9c9be",
+    "name": "Postman",
+    "category": "Tools",
+    "proficiency": 92,
+    "icon": "📬",
+    "order": 3,
+    "createdAt": "2026-11-22T11:37:18.879Z",
+    "updatedAt": "2026-11-22T11:37:18.879Z"
+  },
+  {
+    "_id": "6b02d3ee2c6ff3320ed9c9bf",
+    "name": "VS Code",
+    "category": "Tools",
+    "proficiency": 95,
+    "icon": "💻",
+    "order": 4,
+    "createdAt": "2026-11-22T11:37:18.879Z",
+    "updatedAt": "2026-11-22T11:37:18.879Z"
+  },
+  {
+    "_id": "6b02d3ee2c6ff3320ed9c9c0",
+    "name": "Canva",
+    "category": "Tools",
+    "proficiency": 85,
+    "icon": "🎯",
+    "order": 5,
+    "createdAt": "2026-11-22T11:37:18.879Z",
+    "updatedAt": "2026-11-22T11:37:18.879Z"
   }
 ]
