@@ -736,22 +736,32 @@ function initPortfolioActions() {
   });
 }
 
+// ──────────────────────────────────────────────────
+// Mobile & Desktop Compatible PDF Canvas Viewer
+// ──────────────────────────────────────────────────
+let currentPdfDoc = null;
+let currentPdfZoom = 1.0;
+let currentPdfUrl = null;
+let isPdfRendering = false;
+
+// Configure PDF.js worker location
+if (window.pdfjsLib) {
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'js/pdf.worker.min.js';
+}
+
 /** Open the dedicated Resume Preview Modal */
 window.openResumeModal = function() {
   const overlay = document.getElementById('resumeModalOverlay');
-  const iframe = document.getElementById('resumeModalIframe');
-  const resumeUrl = window.PORTFOLIO_CONFIG?.resumeUrl || DEFAULT_RESUME_URL;
   if (!overlay) return;
 
-  if (iframe) {
-    if (!iframe.src || iframe.src === 'about:blank' || !iframe.src.includes(resumeUrl)) {
-      iframe.src = resumeUrl;
-    }
-  }
+  const resumeUrl = resolveImageUrl(window.PORTFOLIO_CONFIG?.resumeUrl || DEFAULT_RESUME_URL);
 
   overlay.classList.add('active');
   overlay.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
+
+  // Load and render pages cleanly on HTML5 canvas for 100% mobile & desktop compatibility
+  loadAndRenderPdf(resumeUrl);
 };
 
 /** Close the dedicated Resume Preview Modal */
@@ -764,6 +774,184 @@ window.closeResumeModal = function() {
   document.body.style.overflow = '';
 };
 
+/** Load and render PDF using local PDF.js */
+async function loadAndRenderPdf(url, forceReload = false) {
+  const scrollContainer = document.getElementById('resumeCanvasScroll');
+  const pagesContainer = document.getElementById('resumePagesContainer');
+  const loadingEl = document.getElementById('resumeLoadingState');
+  const iframe = document.getElementById('resumeModalIframe');
+
+  if (!window.pdfjsLib) {
+    // Fallback if PDF.js library isn't loaded
+    if (iframe) {
+      iframe.style.display = 'block';
+      if (scrollContainer) scrollContainer.style.display = 'none';
+      if (!iframe.src || iframe.src === 'about:blank' || !iframe.src.includes(url)) {
+        iframe.src = url;
+      }
+    }
+    return;
+  }
+
+  // If already loaded same URL and not forced, keep rendered pages
+  if (currentPdfDoc && currentPdfUrl === url && !forceReload && pagesContainer && pagesContainer.children.length > 0) {
+    return;
+  }
+
+  try {
+    if (loadingEl) loadingEl.style.display = 'flex';
+    if (iframe) iframe.style.display = 'none';
+    if (scrollContainer) scrollContainer.style.display = 'flex';
+    if (pagesContainer) pagesContainer.innerHTML = '';
+
+    currentPdfUrl = url;
+    const loadingTask = window.pdfjsLib.getDocument({
+      url: url,
+      cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',
+      cMapPacked: true,
+    });
+    currentPdfDoc = await loadingTask.promise;
+
+    const numPages = currentPdfDoc.numPages;
+    updatePageIndicators(1, numPages);
+
+    await renderAllPdfPages(currentPdfDoc, currentPdfZoom);
+
+    if (loadingEl) loadingEl.style.display = 'none';
+    setupPdfScrollSpy();
+  } catch (err) {
+    console.warn('PDF.js render error, falling back to native iframe/download:', err);
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (iframe) {
+      iframe.style.display = 'block';
+      iframe.src = url;
+      if (scrollContainer) scrollContainer.style.display = 'none';
+    }
+  }
+}
+
+/** Render all pages of the PDF on HTML5 Canvas */
+async function renderAllPdfPages(pdfDoc, zoomMultiplier = 1.0) {
+  const pagesContainer = document.getElementById('resumePagesContainer');
+  const scrollContainer = document.getElementById('resumeCanvasScroll');
+  if (!pagesContainer || !scrollContainer || !pdfDoc) return;
+
+  if (isPdfRendering) return;
+  isPdfRendering = true;
+
+  try {
+    pagesContainer.innerHTML = '';
+    const numPages = pdfDoc.numPages;
+
+    const isMobile = window.innerWidth <= 768;
+    const horizontalPadding = isMobile ? 24 : 60;
+    const maxDesktopWidth = 840;
+    const availableWidth = Math.min(
+      maxDesktopWidth,
+      Math.max(260, (scrollContainer.clientWidth || window.innerWidth) - horizontalPadding)
+    );
+
+    for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+      const page = await pdfDoc.getPage(pageNum);
+      const unscaledViewport = page.getViewport({ scale: 1.0 });
+
+      // Calculate responsive fit scale
+      const baseFitScale = availableWidth / unscaledViewport.width;
+      const fitScale = baseFitScale * zoomMultiplier;
+      // High-DPI screen support (Retina / OLED) capped at 2x for smooth scrolling performance
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+      const viewport = page.getViewport({ scale: fitScale });
+
+      // Create card wrapper
+      const pageWrapper = document.createElement('div');
+      pageWrapper.className = 'resume-page-wrapper';
+      pageWrapper.dataset.pageNum = String(pageNum);
+
+      const canvas = document.createElement('canvas');
+      canvas.className = 'resume-canvas-page';
+      canvas.width = Math.floor(viewport.width * pixelRatio);
+      canvas.height = Math.floor(viewport.height * pixelRatio);
+      canvas.style.width = Math.floor(viewport.width) + 'px';
+      canvas.style.height = Math.floor(viewport.height) + 'px';
+
+      const ctx = canvas.getContext('2d');
+      ctx.scale(pixelRatio, pixelRatio);
+
+      pageWrapper.appendChild(canvas);
+      pagesContainer.appendChild(pageWrapper);
+
+      const renderContext = {
+        canvasContext: ctx,
+        viewport: viewport
+      };
+
+      await page.render(renderContext).promise;
+    }
+  } catch (renderErr) {
+    console.error('Error rendering PDF page:', renderErr);
+  } finally {
+    isPdfRendering = false;
+  }
+}
+
+/** Zoom controls */
+window.handleResumeZoom = function(delta) {
+  if (!currentPdfDoc) return;
+  currentPdfZoom = Math.max(0.6, Math.min(2.2, parseFloat((currentPdfZoom + delta).toFixed(2))));
+  renderAllPdfPages(currentPdfDoc, currentPdfZoom);
+};
+
+window.handleResumeResetZoom = function() {
+  if (!currentPdfDoc) return;
+  currentPdfZoom = 1.0;
+  renderAllPdfPages(currentPdfDoc, currentPdfZoom);
+};
+
+/** Scroll spy to update page counter while scrolling */
+function setupPdfScrollSpy() {
+  const scrollContainer = document.getElementById('resumeCanvasScroll');
+  if (!scrollContainer) return;
+
+  scrollContainer.onscroll = () => {
+    const wrappers = scrollContainer.querySelectorAll('.resume-page-wrapper');
+    if (!wrappers.length) return;
+
+    const scrollTop = scrollContainer.scrollTop;
+    let activePage = 1;
+
+    wrappers.forEach((w) => {
+      const top = w.offsetTop - scrollContainer.offsetTop;
+      if (scrollTop >= top - 120) {
+        activePage = parseInt(w.dataset.pageNum || '1', 10);
+      }
+    });
+
+    updatePageIndicators(activePage, currentPdfDoc ? currentPdfDoc.numPages : 2);
+  };
+}
+
+function updatePageIndicators(current, total) {
+  const textEl = document.getElementById('resumeCurrentPage');
+  if (textEl) textEl.textContent = String(current);
+
+  const totalEl = document.getElementById('resumeTotalPages');
+  if (totalEl) totalEl.textContent = String(total);
+
+  const headerBadge = document.getElementById('resumeHeaderBadge');
+  if (headerBadge) headerBadge.textContent = `${current} / ${total}`;
+}
+
+// Re-render on device orientation change / screen resize
+window.addEventListener('resize', () => {
+  const overlay = document.getElementById('resumeModalOverlay');
+  if (overlay && overlay.classList.contains('active') && currentPdfDoc) {
+    clearTimeout(window._resumeResizeTimer);
+    window._resumeResizeTimer = setTimeout(() => {
+      renderAllPdfPages(currentPdfDoc, currentPdfZoom);
+    }, 180);
+  }
+});
+
 /** Synchronize resume links across buttons and modal */
 function updateResumeLinks() {
   const resumeUrl = resolveImageUrl(window.PORTFOLIO_CONFIG?.resumeUrl || DEFAULT_RESUME_URL);
@@ -774,9 +962,12 @@ function updateResumeLinks() {
   const tabBtn = document.getElementById('modalResumeTabBtn');
   if (tabBtn) tabBtn.href = resumeUrl;
 
+  const mobileOpenBtn = document.querySelector('.resume-mobile-open-link');
+  if (mobileOpenBtn) mobileOpenBtn.href = resumeUrl;
+
   const iframe = document.getElementById('resumeModalIframe');
   const overlay = document.getElementById('resumeModalOverlay');
-  if (iframe && overlay && overlay.classList.contains('active')) {
+  if (iframe && overlay && overlay.classList.contains('active') && !window.pdfjsLib) {
     iframe.src = resumeUrl;
   }
 }

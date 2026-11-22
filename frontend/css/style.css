@@ -630,12 +630,181 @@ img {
   transform: rotate(90deg);
 }
 
+.resume-header-badge {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.5px;
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text-secondary);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+  border: 1px solid var(--border-color);
+}
+
 .resume-modal-body {
   flex: 1;
   width: 100%;
   height: 100%;
   position: relative;
-  background: #2b2b2b;
+  background: #18181b;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.resume-canvas-scroll {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  background: #18181b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 16px 80px;
+  position: relative;
+}
+
+.resume-pages-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.resume-page-wrapper {
+  background: #ffffff;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  overflow: hidden;
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.resume-canvas-page {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  touch-action: pan-x pan-y;
+}
+
+.resume-loading-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: #a1a1aa;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  background: #18181b;
+  z-index: 10;
+}
+
+.resume-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(255, 255, 255, 0.12);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: resumeSpin 0.8s linear infinite;
+}
+
+@keyframes resumeSpin {
+  to { transform: rotate(360deg); }
+}
+
+.resume-mobile-toolbar {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(24, 24, 27, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+  padding: 6px 14px;
+  z-index: 25;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.5);
+}
+
+.resume-page-indicator {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+  padding: 0 4px;
+  white-space: nowrap;
+}
+
+.resume-zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.resume-zoom-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+  line-height: 1;
+}
+
+.resume-zoom-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.resume-zoom-btn.resume-zoom-fit {
+  border-radius: 6px;
+  width: auto;
+  padding: 0 8px;
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.5px;
+}
+
+.resume-mobile-open-link {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.14);
+  padding: 4px 10px;
+  border-radius: 9999px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.2s ease;
+}
+
+.resume-mobile-open-link:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .resume-iframe {
@@ -1864,12 +2033,16 @@ img {
   }
 
   .resume-modal-overlay {
-    padding: 12px;
+    padding: 0;
   }
 
   .resume-modal-container {
-    height: 92vh;
-    border-radius: 12px;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+    border: none;
   }
 
   .resume-modal-header {
@@ -1878,12 +2051,31 @@ img {
   }
 
   .resume-modal-title {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
+  }
+
+  .resume-header-badge {
+    display: none;
   }
 
   .resume-action-btn {
-    padding: 6px 12px;
-    font-size: 0.72rem;
+    padding: 5px 10px;
+    font-size: 0.68rem;
+  }
+
+  .resume-canvas-scroll {
+    padding: 12px 8px 75px;
+  }
+
+  .resume-page-wrapper {
+    margin-bottom: 14px;
+    border-radius: 4px;
+  }
+
+  .resume-mobile-toolbar {
+    bottom: 12px;
+    padding: 5px 10px;
+    gap: 8px;
   }
 
   /* Contact */

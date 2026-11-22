@@ -364,14 +364,15 @@
     </div>
   </footer>
 
-  <!-- Resume Viewer Modal -->
+  <!-- Resume Viewer Modal (Mobile & Desktop Compatible) -->
   <div class="resume-modal-overlay" id="resumeModalOverlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="resumeModalTitle">
     <div class="resume-modal-backdrop" onclick="closeResumeModal()"></div>
     <div class="resume-modal-container">
       <div class="resume-modal-header">
         <div class="resume-modal-title-group">
-          <span class="resume-modal-badge">DOCUMENT</span>
+          <span class="resume-modal-badge">PDF</span>
           <h3 class="resume-modal-title" id="resumeModalTitle">ANSHUL KAUNDAL — RESUME</h3>
+          <span class="resume-header-badge" id="resumeHeaderBadge">2 PAGES</span>
         </div>
         <div class="resume-modal-actions">
           <a href="resume.pdf" class="resume-action-btn resume-action-download" id="modalResumeDownloadBtn" download="Anshul_Kaundal_Resume.pdf" title="Download Resume PDF">
@@ -395,12 +396,38 @@
           </button>
         </div>
       </div>
-      <div class="resume-modal-body">
-        <iframe src="resume.pdf" class="resume-iframe" id="resumeModalIframe" title="Resume PDF Preview"></iframe>
+      <div class="resume-modal-body" id="resumeModalBody">
+        <!-- Canvas Scroll Container (High Performance Mobile/Desktop Rendering) -->
+        <div class="resume-canvas-scroll" id="resumeCanvasScroll">
+          <div class="resume-loading-state" id="resumeLoadingState">
+            <div class="resume-spinner"></div>
+            <span>Loading document...</span>
+          </div>
+          <div class="resume-pages-container" id="resumePagesContainer"></div>
+        </div>
+
+        <!-- Floating Mobile Navigation & Zoom Bar -->
+        <div class="resume-mobile-toolbar" id="resumeMobileToolbar">
+          <div class="resume-page-indicator" id="resumePageIndicator">
+            <span id="resumeCurrentPage">1</span> / <span id="resumeTotalPages">2</span>
+          </div>
+          <div class="resume-zoom-controls">
+            <button type="button" class="resume-zoom-btn" onclick="handleResumeZoom(-0.15)" aria-label="Zoom out" title="Zoom Out">−</button>
+            <button type="button" class="resume-zoom-btn resume-zoom-fit" onclick="handleResumeResetZoom()" aria-label="Fit width" title="Fit to Screen">FIT</button>
+            <button type="button" class="resume-zoom-btn" onclick="handleResumeZoom(0.15)" aria-label="Zoom in" title="Zoom In">+</button>
+          </div>
+          <a href="resume.pdf" target="_blank" rel="noopener noreferrer" class="resume-mobile-open-link" title="Open in device viewer">
+            ↗ Fullscreen
+          </a>
+        </div>
+
+        <!-- Fallback Iframe (used if PDF.js fails to initialize) -->
+        <iframe src="about:blank" class="resume-iframe" id="resumeModalIframe" title="Resume PDF Preview" style="display: none;"></iframe>
       </div>
     </div>
   </div>
 
+  <script src="js/pdf.min.js"></script>
   <script src="/config.js"></script>
   <script src="js/main.js"></script>
 </body>
