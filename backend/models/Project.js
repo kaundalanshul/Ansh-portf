@@ -44,6 +44,11 @@ const projectSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    label: {
+      type: String,
+      trim: true,
+      default: 'Schooling',
+    },
     order: {
       type: Number,
       default: 0,

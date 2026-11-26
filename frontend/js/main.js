@@ -156,12 +156,16 @@ function renderProjects(projects) {
 
   projects.forEach((proj, idx) => {
     const numStr = String(idx + 1).padStart(2, '0');
+    const projectLabel = proj.label || 'Schooling';
 
     // Index Item
     const indexHTML = `
       <div class="index-item ${idx === 0 ? 'active' : ''}" data-target="proj-${proj._id}">
         <span class="index-num">${numStr}</span>
-        <span class="index-title">${proj.title}</span>
+        <div class="index-title-group">
+          <span class="index-title">${escapeHtml(proj.title)}</span>
+          <span class="schooling-label">${escapeHtml(projectLabel)}</span>
+        </div>
       </div>
     `;
     indexContainer.insertAdjacentHTML('beforeend', indexHTML);
@@ -267,7 +271,10 @@ function renderProjects(projects) {
       <div class="project-showcase" id="proj-${proj._id}">
         ${previewHtml}
         ${liveLinkBelowPhoto}
-        <h3>${proj.title}</h3>
+        <div class="project-title-row">
+          <h3 class="project-title">${escapeHtml(proj.title)}</h3>
+          <span class="schooling-label">${escapeHtml(projectLabel)}</span>
+        </div>
         ${descHtml}
         ${techHtml}
         ${githubLink}
@@ -750,7 +757,7 @@ if (window.pdfjsLib) {
 }
 
 /** Open the dedicated Resume Preview Modal */
-window.openResumeModal = function() {
+window.openResumeModal = function () {
   const overlay = document.getElementById('resumeModalOverlay');
   if (!overlay) return;
 
@@ -765,7 +772,7 @@ window.openResumeModal = function() {
 };
 
 /** Close the dedicated Resume Preview Modal */
-window.closeResumeModal = function() {
+window.closeResumeModal = function () {
   const overlay = document.getElementById('resumeModalOverlay');
   if (!overlay) return;
 
@@ -895,13 +902,13 @@ async function renderAllPdfPages(pdfDoc, zoomMultiplier = 1.0) {
 }
 
 /** Zoom controls */
-window.handleResumeZoom = function(delta) {
+window.handleResumeZoom = function (delta) {
   if (!currentPdfDoc) return;
   currentPdfZoom = Math.max(0.6, Math.min(2.2, parseFloat((currentPdfZoom + delta).toFixed(2))));
   renderAllPdfPages(currentPdfDoc, currentPdfZoom);
 };
 
-window.handleResumeResetZoom = function() {
+window.handleResumeResetZoom = function () {
   if (!currentPdfDoc) return;
   currentPdfZoom = 1.0;
   renderAllPdfPages(currentPdfDoc, currentPdfZoom);
@@ -1217,7 +1224,7 @@ window.openInterestDetail = function (idOrTitle) {
   if (imgEl) {
     imgEl.src = image;
     imgEl.alt = title;
-    imgEl.onerror = function() {
+    imgEl.onerror = function () {
       this.onerror = null;
       this.src = 'hobby_music.jpg';
     };

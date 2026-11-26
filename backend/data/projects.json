@@ -1,5 +1,6 @@
 [
   {
+    "label": "Schooling",
     "_id": "6b02d3ee2c6ff3320ed9c9a4",
     "title": "MegaMart — Full-Stack Grocery & E-Commerce Web Application",
     "description": "Built a responsive grocery e-commerce platform with light/dark theming, multi-language support, and a Node.js/Express REST API featuring rate-limiting, centralized error handling, and full CRUD for products, cart, wishlist, and orders. Developed an isolated Admin Portal for live inventory, order fulfillment, category tags, and sales metrics, with automated MongoDB Atlas seeding, stock validation, and Stripe checkout integration.",
@@ -20,12 +21,14 @@
     "liveUrl": "",
     "githubUrl": "https://github.com/kaundalanshul/grocery.store",
     "featured": true,
+    "label": "Schooling",
     "order": 1,
     "__v": 0,
     "createdAt": "2026-11-22T11:37:18.652Z",
     "updatedAt": "2026-11-22T11:37:18.652Z"
   },
   {
+    "label": "Schooling",
     "_id": "6b02d3ee2c6ff3320ed9c9a5",
     "title": "AI-Powered Voice Virtual Assistant",
     "description": "Built a personalized MERN-stack voice assistant integrating the Google Gemini API for natural language intent parsing and structured prompt engineering, with real-time bidirectional STT/TTS via Web Speech API and automated browser workflows. Implemented JWT/bcryptjs authentication, media uploads via Multer and Cloudinary, and MongoDB persistence for session command history.",
@@ -45,16 +48,18 @@
       "Multer",
       "Cloudinary"
     ],
-    "imageUrl": "",
+    "imageUrl": "/api/images/6b07eb41bab66bdb57799535",
     "liveUrl": "",
     "githubUrl": "https://github.com/kaundalanshul",
     "featured": true,
+    "label": "Schooling",
     "order": 2,
     "__v": 0,
     "createdAt": "2026-11-22T11:37:18.653Z",
-    "updatedAt": "2026-11-22T11:37:18.653Z"
+    "updatedAt": "2026-11-26T08:18:12.448Z"
   },
   {
+    "label": "Schooling",
     "_id": "6b02d3ee2c6ff3320ed9c9a6",
     "title": "PriceCompt — Multi-Store Price Comparison Engine",
     "description": "Developed a real-time price comparison platform tracking products across Amazon, Flipkart, Croma, and Reliance Digital with a custom URL analyzer and cron-scheduled background price-drop alerts. Implemented secure JWT/bcrypt authentication and an admin control panel to manage verified deals and retailer scrapers.",
@@ -70,16 +75,18 @@
       "Web Scraping (Cheerio)",
       "Cron Scheduling"
     ],
-    "imageUrl": "",
+    "imageUrl": "/api/images/6b07ebd1bab66bdb5779953c",
     "liveUrl": "",
     "githubUrl": "https://github.com/kaundalanshul",
     "featured": true,
+    "label": "Schooling",
     "order": 3,
     "__v": 0,
     "createdAt": "2026-11-22T11:37:18.654Z",
-    "updatedAt": "2026-11-22T11:37:18.654Z"
+    "updatedAt": "2026-11-26T08:20:35.851Z"
   },
   {
+    "label": "Schooling",
     "_id": "6b02d3ee2c6ff3320ed9c9a7",
     "title": "Student Management System",
     "description": "Built a database-driven web application with student registration, profile management, and full CRUD operations for streamlined student record storage and retrieval.",
@@ -96,12 +103,14 @@
     "liveUrl": "",
     "githubUrl": "https://github.com/kaundalanshul",
     "featured": false,
+    "label": "Schooling",
     "order": 4,
     "__v": 0,
     "createdAt": "2026-11-22T11:37:18.654Z",
     "updatedAt": "2026-11-22T11:37:18.654Z"
   },
   {
+    "label": "Schooling",
     "_id": "6b02d3ee2c6ff3320ed9c9a8",
     "title": "Weather Condition App",
     "description": "Developed a Python desktop GUI application integrating a third-party weather API for live weather data fetching, backend processing, and real-time display.",
@@ -112,13 +121,14 @@
       "RESTful APIs",
       "JSON Processing"
     ],
-    "imageUrl": "",
+    "imageUrl": "/api/images/6b07ec94bab66bdb57799566",
     "liveUrl": "",
     "githubUrl": "https://github.com/kaundalanshul",
     "featured": false,
+    "label": "Schooling",
     "order": 5,
     "__v": 0,
     "createdAt": "2026-11-22T11:37:18.654Z",
-    "updatedAt": "2026-11-22T11:37:18.654Z"
+    "updatedAt": "2026-11-26T08:23:50.869Z"
   }
 ]
