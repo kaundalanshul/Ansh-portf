@@ -66,7 +66,7 @@ img {
 .editorial-layout {
   display: flex;
   gap: 80px;
-  padding: 120px 0;
+  padding: 120px 40px;
 }
 
 .col {
@@ -893,6 +893,27 @@ img {
   display: block;
 }
 
+.contact {
+  position: relative;
+  background: var(--bg-color);
+  width: 100%;
+}
+
+.contact .container.editorial-layout,
+.contact .editorial-layout {
+  padding: 100px 40px 120px;
+}
+
+.contact-left-col {
+  padding-left: 28px;
+  padding-right: 20px;
+}
+
+.contact-right-col {
+  padding-left: 10px;
+  padding-right: 20px;
+}
+
 .contact-email {
   font-size: 2rem;
   font-weight: 500;
@@ -1661,7 +1682,12 @@ img {
   .editorial-layout {
     flex-direction: column;
     gap: 40px;
-    padding: 60px 0;
+    padding: 60px 24px;
+  }
+
+  .contact-left-col {
+    padding-left: 16px;
+    padding-right: 16px;
   }
 
   .about-image-wrapper {
@@ -1854,7 +1880,17 @@ img {
   /* Contact */
   .editorial-layout {
     gap: 30px;
-    padding: 50px 0;
+    padding: 50px 20px;
+  }
+
+  .contact-left-col {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .contact-right-col {
+    padding-left: 10px;
+    padding-right: 10px;
   }
 
   .contact-email {
@@ -2160,7 +2196,17 @@ img {
   /* Contact */
   .contact .editorial-layout {
     gap: 20px;
-    padding: 40px 0;
+    padding: 40px 16px;
+  }
+
+  .contact-left-col {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  .contact-right-col {
+    padding-left: 4px;
+    padding-right: 4px;
   }
 
   .contact-email {
